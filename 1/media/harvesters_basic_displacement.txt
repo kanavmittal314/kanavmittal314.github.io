@@ -1,0 +1,2 @@
+Green displacement for harvesters_basic: (118, -3)
+ Red displacement for harvesters_basic: (120, 7)

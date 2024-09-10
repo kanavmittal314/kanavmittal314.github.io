@@ -1,0 +1,2 @@
+Green displacement for harvesters_cropping: (60, 17)
+ Red displacement for harvesters_cropping: (124, 13)

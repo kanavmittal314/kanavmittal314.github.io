@@ -1,0 +1,2 @@
+Green displacement for icon_cropping: (41, 17)
+ Red displacement for icon_cropping: (89, 23)

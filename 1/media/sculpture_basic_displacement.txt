@@ -1,0 +1,2 @@
+Green displacement for sculpture_basic: (33, -11)
+ Red displacement for sculpture_basic: (140, -26)

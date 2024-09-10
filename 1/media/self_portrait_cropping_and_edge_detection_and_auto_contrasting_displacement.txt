@@ -1,0 +1,2 @@
+Green displacement for self_portrait_cropping_and_edge_detection_and_auto_contrasting: (78, 29)
+ Red displacement for self_portrait_cropping_and_edge_detection_and_auto_contrasting: (176, 37)

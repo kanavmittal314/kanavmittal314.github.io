@@ -1,0 +1,2 @@
+Green displacement for three_generations_cropping: (53, 14)
+ Red displacement for three_generations_cropping: (112, 11)

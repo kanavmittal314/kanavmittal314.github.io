@@ -1,0 +1,2 @@
+Green displacement for cathedral_basic: (1, -1)
+ Red displacement for cathedral_basic: (7, -1)

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Project 1 - Images of the Russian Empire: Colorizing the Prokudin-Gorskii photo collection</h1>
+
+    <h2> Overview </h2>
+    <p> In this project, we looked at how to combine three glass plate images corresponding to applying red, blue, and green filters to create a single color image. There's a catch, however -- the three glass plate images are not perfectly aligned. We investigated how to align the images such that they can stack together and form a coherent colored image. Specifically, we aligned the red to the blue and the green to the blue.  </p>
+    <p>For the historical context for this project, we took a look at images from the Prokudin-Gorskii photo collection which have been preserved by the Library of Congress. </p>
+
+    <h2> Single-Scale Implementation </h2>
+
+    <p> We scanned over possible displacements of -15 to 15 along both axes. We tested each possible displacement and calculated the similarity between the displaced image (red or green) and the target (blue) using normalized cross-correlation. We use the displacement that yields the highest similarity and then align the red and green to the blue. Finally, we stack the images as color channels. </p>
+
+
+    <p> Here we report different approaches to colorizing.
+        <ol>
+            <li>Naive approach of stacking the images</li>
+            <li>Finding the best displacement and then using the best displacement to align the images</li>
+            <li>Same as (2) but when finding the best displacement, calculate similarity only over the middle parts of the image (i.e., cropping out the sides)</li>
+
+        </ol>
+    </p>
+
+    The reason why I tried the 3rd strategy from above is because images like monastery.jpg did not originally align well. I thought that because the red, green, and blue filters are not aligned, border pixels in one filter image might not be present in other filter images at all. Thus, we tried to crop the borders out to just calculate the match over the interior of the image. 
+    <table> 
+        <thead>
+            <th>Image</th>
+            <th>Naive Stacking</th>
+            <th>Displace & Align</th>
+            <th>Displace & Align with Cropping</th>
+        </thead>
+        <tr>
+            <td>cathedral.jpg</td>
+            <td><img src="./media/cathedral_naive.jpg" width="300"/></td>
+            <td><img src="./media/cathedral_basic.jpg" width="300"/> 
+                <br> Green displacement: (1, -1)
+                <br> Red displacement: (7, 1)
+            </td>
+            <td><img src="./media/cathedral_cropping.jpg" width="300"/> 
+                <br> Green displacement: (5, 2)
+                <br> Red displacement: (12, 3)
+            </td>
+        </tr>
+        <tr>
+            <td>monastery.jpg</td>
+            <td><img src="./media/monastery_naive.jpg" width="300"/></td>
+            <td><img src="./media/monastery_basic.jpg" width="300"/>
+                <br> Green displacement: (-6, 0)
+                <br> Red displacement: (9, 1)</td>
+            <td><img src="./media/monastery_cropping.jpg" width="300"/>
+                <br> Green displacement: (-3, 2)
+                <br> Red displacement: (3, 2)</td>
+        </tr>
+        <tr>
+            <td>tobolsk.jpg</td>
+            <td><img src="./media/tobolsk_naive.jpg" width="300"/></td>
+            <td><img src="./media/tobolsk_basic.jpg" width="300"/>
+                <br> Green displacement: (3, 2)
+                <br> Red displacement: (6, 3)</td>
+            <td><img src="./media/tobolsk_cropping.jpg" width="300"/>
+                <br> Green displacement: (3, 3)
+                <br> Red displacement: (6, 3)</td>
+        </tr>
+        <tr>
+            <td>camel.jpg (my choice)</td>
+            <td><img src="./media/camel_naive.jpg" width="300"/></td>
+            <td><img src="./media/camel_basic.jpg" width="300"/>
+                <br> Green displacement: (6, 0)
+                <br> Red displacement: (7, 0)</td>
+            <td><img src="./media/camel_cropping.jpg" width="300"/>
+                <br> Green displacement: (2, 2)
+                <br> Red displacement: (8, 4)</td>
+        </tr>
+    </table>
+    <!-- <h3> cathedral.jpg </h3>
+    <h4> Original </h4>
+    <img src="./media/originals/cathedral.jpg"/>
+
+    <h4> Aligned </h4>
+    <img src="./media/alignments/cathedral.jpg"/>
+
+    <p>Green displacement for cathedral.jpg: (1, -1)<br>
+    Red displacement for cathedral.jpg: (7, -1)</p>
+
+    <h3> monastery.jpg </h3>
+    <h4> Original </h4>
+    <img src="./media/originals/monastery.jpg"/>
+
+    <h4> Aligned </h4>
+    <img src="./media/alignments/monastery.jpg"/>
+
+    <p>Green displacement for monastery.jpg: (-6, 0)<br>
+    Red displacement for monastery.jpg: (9, 1)</p>
+
+    <h3> tobolsk.jpg </h3>
+    <h4> Original </h4>
+    <img src="./media/originals/tobolsk.jpg"/>
+
+    <h4> Aligned </h4>
+    <img src="./media/alignments/tobolsk.jpg"/>
+
+    <p>Green displacement for tobolsk.jpg: (3, 2)<br>
+    Red displacement for tobolsk.jpg: (6, 3)</p> -->
+    
+    <h2> Image Pyramid Implementation </h2>
+    <p> For larger images, we used an image pyramid. We first downscaled the image and target by a factor of two and then recursively aligned the image and target. Then, we take the optimal displacement for the downscaled image and multiply it by 2 to get a reasonable displacement for the regular-scaled image. We tune on this displacement by scanning over a smaller window of possible additional displacements (from -5 to 5) to get a final displacement. </p>
+
+
+    <p> Here we report different approaches to colorizing.
+        <ol>
+            <li>Naive approach of stacking the images</li>
+            <li>Finding the best displacement and then using the best displacement to align the images</li>
+            <li>Same as (2) but when finding the best displacement, calculate similarity only over the middle parts of the image (i.e., cropping out the sides)</li>
+
+        </ol>
+    </p>
+        <table> 
+        <thead>
+            <th>Image</th>
+            <th>Naive Stacking</th>
+            <th>Displace & Align</th>
+            <th>Displace & Align with Cropping</th>
+        </thead>
+        <tr>
+            <td>church.tif</td>
+            <td><img src="./media/church_naive.jpg" width="300"/></td>
+            <td><img src="./media/church_basic.jpg" width="300"/>
+                <br> Green displacement: (0, -5)
+                <br> Red displacement: (52, -6)</td>
+            <td><img src="./media/church_cropping.jpg" width="300" />
+                <br> Green displacement: (25, 4)
+                <br> Red displacement: (58, -4)</td>
+        </tr>
+        <tr>
+            <td>emir.tif</td>
+            <td><img src="./media/emir_naive.jpg" width="300"/></td>
+            <td><img src="./media/emir_basic.jpg" width="300"/>
+                <br> Green displacement: (-3, 7)
+                <br> Red displacement: (107, 17)</td>
+            <td><img src="./media/emir_cropping.jpg" width="300"/>
+                <br> Green displacement: (49, 24)
+                <br> Red displacement: (419, -198)</td>
+        </tr>
+        <tr>
+            <td>harvesters.tif</td>
+            <td><img src="./media/harvesters_naive.jpg" width="300"/></td>
+            <td><img src="./media/harvesters_basic.jpg" width="300"/>
+                <br> Green displacement: (118, -3)
+                <br> Red displacement: (120, 7)</td>
+            <td><img src="./media/harvesters_cropping.jpg" width="300"/>
+                <br> Green displacement: (60, 17)
+                <br> Red displacement: (124, 13)</td>
+        </tr>
+        <tr>
+            <td>icon.tif</td>
+            <td><img src="./media/icon_naive.jpg" width="300"/></td>
+            <td><img src="./media/icon_basic.jpg" width="300"/>
+                <br> Green displacement: (42, 16)
+                <br> Red displacement: (89, 22)</td>
+            <td><img src="./media/icon_cropping.jpg" width="300"/>
+                <br> Green displacement: (41, 17)
+                <br> Red displacement: (89, 23)</td>
+        </tr>
+        <tr>
+            <td>lady.tif</td>
+            <td><img src="./media/lady_naive.jpg" width="300"/></td>
+            <td><img src="./media/lady_basic.jpg" width="300"/>
+                <br> Green displacement: (57, -6)
+                <br> Red displacement: (123, -17)</td>
+            <td><img src="./media/lady_cropping.jpg" width="300"/>
+                <br> Green displacement: (55, 8)
+                <br> Red displacement: (117, 11)</td>
+        </tr>
+        <tr>
+            <td>melons.tif</td>
+            <td><img src="./media/melons_naive.jpg" width="300"/></td>
+            <td><img src="./media/melons_basic.jpg" width="300"/>
+                <br> Green displacement: (83, 4)
+                <br> Red displacement: (176, 7)</td>
+            <td><img src="./media/melons_cropping.jpg" width="300"/>
+                <br> Green displacement: (82, 11)
+                <br> Red displacement: (178, 13)</td>
+        </tr>
+         <tr>
+            <td>onion_church.tif</td>
+            <td><img src="./media/onion_church_naive.jpg" width="300"/></td>
+            <td><img src="./media/onion_church_basic.jpg" width="300"/>
+                <br> Green displacement: (52, 22)
+                <br> Red displacement: (108, 0)</td>
+            <td><img src="./media/onion_church_cropping.jpg" width="300"/>
+                <br> Green displacement: (51, 27)
+                <br> Red displacement: (108, 36)</td>
+        </tr>
+        <tr>
+            <td>peony.tif (my choice)</td>
+            <td><img src="./media/peony_naive.jpg" width="300"/></td>
+            <td><img src="./media/peony_basic.jpg" width="300"/>
+                <br> Green displacement: (50, 1)
+                <br> Red displacement: (103, -7)</td>
+            <td><img src="./media/peony_cropping.jpg" width="300"/>
+                <br> Green displacement: (51, 3)
+                <br> Red displacement: (104, -6)</td>
+        </tr>
+        <tr>
+            <td>sculpture.tif</td>
+            <td><img src="./media/sculpture_naive.jpg" width="300"/></td>
+            <td><img src="./media/sculpture_basic.jpg" width="300"/>
+                <br> Green displacement: (33, -11)
+                <br> Red displacement: (140, -26)</td>
+            <td><img src="./media/sculpture_cropping.jpg" width="300"/>
+                <br> Green displacement: (33, -11)
+                <br> Red displacement: (140, -27)</td>
+        </tr>
+        <tr>
+            <td>self_portrait.tif</td>
+            <td><img src="./media/self_portrait_naive.jpg" width="300"/></td>
+            <td><img src="./media/self_portrait_basic.jpg" width="300"/>
+                <br> Green displacement: (50, -2)
+                <br> Red displacement: (130, -5)</td>
+            <td><img src="./media/self_portrait_cropping.jpg" width="300"/>
+                <br> Green displacement: (79, 29)
+                <br> Red displacement: (176, 37)</td>
+        </tr>
+        <tr>
+            <td>three_generations.tif</td>
+            <td><img src="./media/three_generations_naive.jpg" width="300"/></td>
+            <td><img src="./media/three_generations_basic.jpg" width="300"/>
+                <br> Green displacement: (52, 5)
+                <br> Red displacement: (108, 7)</td>
+            <td><img src="./media/three_generations_cropping.jpg" width="300"/>
+                <br> Green displacement: (53, 14)
+                <br> Red displacement: (112, 11)</td>
+        </tr>
+        <tr>
+            <td>train.tif</td>
+            <td><img src="./media/train_naive.jpg" width="300"/></td>
+            <td><img src="./media/train_basic.jpg" width="300"/>
+                <br> Green displacement: (111, -7)
+                <br> Red displacement: (107, 1)</td>
+            <td><img src="./media/train_cropping.jpg" width="300"/>
+                <br> Green displacement: (43, 6)
+                <br> Red displacement: (87, 32)</td>
+        </tr>
+        
+
+
+
+    </table>
+
+    <h2>Bells and Whistles #1: Edge Detection </h2>
+
+    We apply the Sobel edge filter (https://scikit-image.org/docs/stable/api/skimage.filters.html#skimage.filters.sobel) to produce an edge map that we then align. This can be better than aligning on just pixel values, since aligning on pixel values assumes that the pixel values are similar across the color channels which is not always true. 
+
+    The edge filter was especially helpful for the emir image due to the high amount of single color (blue) within it. 
+
+    <table>
+        <thead>
+            <th>Image</th>
+            <th>Displace & Align with Cropping (previous strategy)</th>
+            <th>Displace & Align with Cropping and Edge Detection (new strategy)</th>
+        </thead>
+        <tr>
+            <td>emir.tif</td>
+            <td><img src="./media/emir_cropping.jpg" width="300"/></td>
+            <td><img src="./media/emir_cropping_and_edge_detection.jpg" width="300"/>
+                <br> Green displacement: (49, 24)
+                <br> Red displacement: (107, 40)</td>
+            </td>
+        </tr>
+        <tr>
+            <td>harvesters.tif</td>
+            <td><img src="./media/harvesters_cropping.jpg" width="300"/></td>
+            <td><img src="./media/harvesters_cropping_and_edge_detection.jpg" width="300"/>
+                <br> Green displacement: (60, 17)
+                <br> Red displacement: (124, 14)</td>
+            </td>
+        </tr>
+        
+        
+
+    </table>
+
+    <h2>Bells and Whistles #2: Automatic contrasting</h2>
+
+    We apply the following formula to linearly scale all pixels in the image. (pixel value - minimum pixel value) / (maximum pixel value - minimum pixel value). This way, the maximum pixel in the image becomes 1, and the minimum becomes 0.
+    <table>
+        <thead>
+            <th>Image</th>
+            <th>Displace & Align with Cropping, Edge Detection, and Auto-Contrast (new strategy)</th>
+        </thead>
+        <tr>
+            <td>camel.jpg</td>
+            <td><img src="./media/camel_cropping_and_edge_detection_and_auto_contrasting.jpg" width="300"/>
+                <br> Green displacement: (2, 2)
+                <br> Red displacement: (8, 4)</td>
+            </td>
+
+        </tr>
+        <tr>
+            <td>church.tif</td>
+            <td><img src="./media/church_cropping_and_edge_detection_and_auto_contrasting.jpg" width="300"/>
+                <br> Green displacement: (25, 4)
+                <br> Red displacement: (58, -4)</td>
+            </td>
+          </tr>
+    </table>
+</body>
+</html>

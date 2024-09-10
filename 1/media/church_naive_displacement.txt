@@ -1,0 +1,2 @@
+Green displacement for church_naive: (0, 0)
+ Red displacement for church_naive: (0, 0)

@@ -1,0 +1,2 @@
+Green displacement for lady_cropping: (55, 8)
+ Red displacement for lady_cropping: (117, 11)

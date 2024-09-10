@@ -1,0 +1,2 @@
+Green displacement for harvesters_cropping_and_edge_detection_and_auto_contrasting: (60, 17)
+ Red displacement for harvesters_cropping_and_edge_detection_and_auto_contrasting: (124, 14)

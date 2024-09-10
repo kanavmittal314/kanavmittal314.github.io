@@ -1,0 +1,2 @@
+Green displacement for lady_basic: (57, -6)
+ Red displacement for lady_basic: (123, -17)

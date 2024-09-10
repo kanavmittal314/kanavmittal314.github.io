@@ -1,0 +1,2 @@
+Green displacement for camel_cropping: (2, 2)
+ Red displacement for camel_cropping: (8, 4)

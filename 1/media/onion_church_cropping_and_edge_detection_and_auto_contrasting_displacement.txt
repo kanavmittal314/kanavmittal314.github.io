@@ -1,0 +1,2 @@
+Green displacement for onion_church_cropping_and_edge_detection_and_auto_contrasting: (51, 26)
+ Red displacement for onion_church_cropping_and_edge_detection_and_auto_contrasting: (107, 35)

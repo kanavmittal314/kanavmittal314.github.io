@@ -1,0 +1,2 @@
+Green displacement for cathedral_cropping_and_edge_detection_and_auto_contrasting: (5, 2)
+ Red displacement for cathedral_cropping_and_edge_detection_and_auto_contrasting: (12, 3)

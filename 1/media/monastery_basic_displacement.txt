@@ -1,0 +1,2 @@
+Green displacement for monastery_basic: (-6, 0)
+ Red displacement for monastery_basic: (9, 1)

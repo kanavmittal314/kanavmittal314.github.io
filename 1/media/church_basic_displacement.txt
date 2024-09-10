@@ -1,0 +1,2 @@
+Green displacement for church_basic: (0, -5)
+ Red displacement for church_basic: (52, -6)

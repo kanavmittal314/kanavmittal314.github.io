@@ -1,0 +1,2 @@
+Green displacement for emir_cropping_and_edge_detection_and_auto_contrasting: (49, 24)
+ Red displacement for emir_cropping_and_edge_detection_and_auto_contrasting: (107, 40)

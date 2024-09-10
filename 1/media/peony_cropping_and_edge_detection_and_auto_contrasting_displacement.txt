@@ -1,0 +1,2 @@
+Green displacement for peony_cropping_and_edge_detection_and_auto_contrasting: (52, 3)
+ Red displacement for peony_cropping_and_edge_detection_and_auto_contrasting: (104, -5)

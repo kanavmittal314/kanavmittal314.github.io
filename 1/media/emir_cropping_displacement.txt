@@ -1,0 +1,2 @@
+Green displacement for emir_cropping: (49, 24)
+ Red displacement for emir_cropping: (419, -198)

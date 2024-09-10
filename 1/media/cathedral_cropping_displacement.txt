@@ -1,0 +1,2 @@
+Green displacement for cathedral_cropping: (5, 2)
+ Red displacement for cathedral_cropping: (12, 3)

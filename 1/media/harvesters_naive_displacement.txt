@@ -1,0 +1,2 @@
+Green displacement for harvesters_naive: (0, 0)
+ Red displacement for harvesters_naive: (0, 0)

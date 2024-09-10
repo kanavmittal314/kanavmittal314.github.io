@@ -1,0 +1,2 @@
+Green displacement for sculpture_cropping: (33, -11)
+ Red displacement for sculpture_cropping: (140, -27)

@@ -1,0 +1,2 @@
+Green displacement for onion_church_cropping: (51, 27)
+ Red displacement for onion_church_cropping: (108, 36)

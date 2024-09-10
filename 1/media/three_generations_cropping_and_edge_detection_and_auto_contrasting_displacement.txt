@@ -1,0 +1,2 @@
+Green displacement for three_generations_cropping_and_edge_detection_and_auto_contrasting: (54, 12)
+ Red displacement for three_generations_cropping_and_edge_detection_and_auto_contrasting: (111, 9)

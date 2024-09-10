@@ -1,0 +1,2 @@
+Green displacement for tobolsk_cropping_and_edge_detection_and_auto_contrasting: (3, 3)
+ Red displacement for tobolsk_cropping_and_edge_detection_and_auto_contrasting: (6, 3)

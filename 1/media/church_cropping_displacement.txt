@@ -1,0 +1,2 @@
+Green displacement for church_cropping: (25, 4)
+ Red displacement for church_cropping: (58, -4)

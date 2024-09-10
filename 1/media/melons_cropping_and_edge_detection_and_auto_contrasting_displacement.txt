@@ -1,0 +1,2 @@
+Green displacement for melons_cropping_and_edge_detection_and_auto_contrasting: (80, 10)
+ Red displacement for melons_cropping_and_edge_detection_and_auto_contrasting: (177, 13)

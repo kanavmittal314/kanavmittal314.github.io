@@ -1,0 +1,2 @@
+Green displacement for three_generations_naive: (0, 0)
+ Red displacement for three_generations_naive: (0, 0)

@@ -1,0 +1,2 @@
+Green displacement for icon_basic: (42, 16)
+ Red displacement for icon_basic: (89, 22)

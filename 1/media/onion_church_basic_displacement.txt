@@ -1,0 +1,2 @@
+Green displacement for onion_church_basic: (52, 22)
+ Red displacement for onion_church_basic: (108, 0)

@@ -1,0 +1,2 @@
+Green displacement for church_cropping_and_edge_detection: (25, 4)
+ Red displacement for church_cropping_and_edge_detection: (58, -4)
