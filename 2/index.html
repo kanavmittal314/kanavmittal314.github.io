@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Project 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Project 2: Fun with Filters and Frequencies</h1>
+    <h2>Part 1: Fun with Filters</h2>
+    <h3>Part 1.1: Finite Difference Operator</h3>
+    <p>We compute the partial derivatives in x and in y of the cameraman image by convolving the cameraman image with
+        the finite difference operators.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/cameraman.png" width="300" />
+                <p>Original cameraman image</p>
+            </td>
+            <td>
+                <img src="media/cameraman_dx.jpg" width="300" />
+                <p>Partial derivative in x</p>
+            </td>
+            <td>
+                <img src="media/cameraman_dy.jpg" width="300" />
+                <p>Partial derivative in y</p>
+            </td>
+        </tr>
+    </table>
+    <p>We then compute the gradient magnitude by squaring the partial derivatives in x and in y, adding them together,
+        and taking the square root.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/cameraman.png" width="300" />
+                <p>Original cameraman image</p>
+            </td>
+            <td>
+                <img src="media/gradient_magnitude.jpg" width="300" />
+                <p>Gradient magnitude</p>
+            </td>
+            <td>
+                <img src="media/binarized_gradient_magnitude.jpg" width="300" />
+                <p>Binarized gradient magnitude (threshold = 0.3)</p>
+            </td>
+        </tr>
+    </table>
+    <h3>Part 1.2: Derivative of Gaussian (DoG) Filter</h3>
+    <h4>Blur-then-derivative</h4>
+    <p>We blur the cameraman image to smooth out noise by convolving with a 2D Gaussian filter. We then repeat the
+        previous procedure, convolving with the finite difference operators to compute the partial derivatives</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/cameraman.png" width="300" />
+                <p>Original cameraman image</p>
+            </td>
+            <td>
+                <img src="media/blurred_cameraman.jpg" width="300" />
+                <p>Blurred cameraman image</p>
+            </td>
+            <td>
+                <img src="media/dx_blurred_cameraman.jpg" width="300" />
+                <p>Partial derivative in x</p>
+            </td>
+            <td>
+                <img src="media/dy_blurred_cameraman.jpg" width="300" />
+                <p>Partial derivative in y</p>
+            </td>
+        </tr>
+    </table>
+    <p>From the partial derivatives of the blurred images, we compute the gradient magnitude and a binarized version.
+    </p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/cameraman.png" width="300" />
+                <p>Original cameraman image</p>
+            </td>
+            <td>
+                <img src="media/blurred_cameraman.jpg" width="300" />
+                <p>Blurred cameraman image</p>
+            </td>
+            <td>
+                <img src="media/gradient_blurred_cameraman.jpg" width="300" />
+                <p>Gradient magnitude</p>
+            </td>
+            <td>
+                <img src="media/binary_gradient_blurred_cameraman.jpg" width="300" />
+                <p>Binarized gradient magnitude (threshold = 0.03)</p>
+            </td>
+        </tr>
+    </table>
+    <p>The differences we see by blurring the cameraman are as follows. It appears that by blurring the cameraman, we
+        pick up on a lot fewer edges -- these edges were likely a result of noise. Because the Gaussian filter acts as a
+        lowpass filter and attenuates high-frequency noise, blurring the image using a Gaussian convolution can reduce
+        the impact of fake edges created as a result of noise. As a result, we need a lower threshold when binarizing
+        the gradient magnitude image in order to get a good image that represents most of the real edges. </p>
+    <h4>Create and apply Derivative of Gaussian (DoG) filter</h4>
+    <p>We convolve the Gaussian with the finite difference operators to create Derivative of Gaussian filters for both
+        the x and y directions.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/dog_x.jpg" width="300" />
+                <p>Derivative of Gaussian (x direction)</p>
+            </td>
+            <td>
+                <img src="media/dog_y.jpg" width="300" />
+                <p>Derivative of Gaussian (y direction)</p>
+            </td>
+        </tr>
+    </table>
+    <p>We then apply the DoG filters to compute partial derivatives in x and in y. We compute the gradient magnitude
+        image and binarize. The second row of the below images shows the results from when we first blurred the image
+        and then took the partial derivatives. We can see that the results are the same, which makes sense given the
+        associative nature of convolution.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/dog_x_cameraman.jpg" width="300" />
+                <p>Partial derivative in x using DoG</p>
+            </td>
+            <td>
+                <img src="media/dog_y_cameraman.jpg" width="300" />
+                <p>Partial derivative in y using DoG</p>
+            </td>
+            <td>
+                <img src="media/dog_gradient_magnitude_cameraman.jpg" width="300" />
+                <p>Gradient magnitude using DoG</p>
+            </td>
+            <td>
+                <img src="media/dog_binary_gradient_magnitude_cameraman.jpg" width="300" />
+                <p>Binarized gradient magnitude (threshold = 0.03) using DoG</p>
+            </td>
+        </tr>
+        <tr></tr>
+        <td>
+            <img src="media/dx_blurred_cameraman.jpg" width="300" />
+            <p>Partial derivative in x without using DoG</p>
+        </td>
+        <td>
+            <img src="media/dy_blurred_cameraman.jpg" width="300" />
+            <p>Partial derivative in y without using DoG</p>
+        </td>
+        <td>
+            <img src="media/gradient_blurred_cameraman.jpg" width="300" />
+            <p>Gradient magnitude without using DoG</p>
+        </td>
+        <td>
+            <img src="media/binary_gradient_blurred_cameraman.jpg" width="300" />
+            <p>Binarized gradient magnitude (threshold = 0.03) without using DoG</p>
+        </td>
+        </tr>
+    </table>
+    <h2>Part 2: Fun with Frequencies!</h2>
+    <h3>Part 2.1: Image "Sharpening"</h3>
+    <p>We first demonstrate the process of sharpening on the picture of the Taj Mahal. We blur the Taj Mahal by applying
+        a Gaussian filter to get the low frequencies present in the image, and then subtract this from the original
+        image of the Taj Mahal to get the high frequencies in the image. We add back these high frequencies (using an
+        alpha = 1) to the original Taj Mahal image to get a sharpened version. Alpha is a parameter that corresponds to
+        how much of the high frequencies to add back in -- the higher the alpha, the more high frequencies are added
+        back, and the more the image is sharpened. For all of the following images except the originals, we apply
+        `np.clip` to keep the pixel values between 0 and 1. For all of the following, we use Gaussians of sigma = 5.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/taj.jpg" width="300" />
+                <p>Original Taj</p>
+            </td>
+            <td>
+                <img src="media/taj_blur.jpg" width="300" />
+                <p>Blurring the Taj with the Gaussian (getting low frequencies of the image)</p>
+            </td>
+            <td>
+                <img src="media/taj_high_freqs.jpg" width="300" />
+                <p>Subtracting blurred Taj from original (getting high frequencies of the image)</p>
+            </td>
+            <td>
+                <img src="media/taj_sharpened.jpg" width="300" />
+                <p>Adding high frequencies back in (with the alpha multiple of 1) to the original Taj</p>
+            </td>
+        </tr>
+    </table>
+    <p>Now, we also define a single unsharp mask filter as (1 + alpha) * unit_impulse - alpha * gaussian that sharpens
+        an image. Higher alphas correspond to more sharpening. We show the results for various alpha values.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/taj_unsharp_mask_alpha1.jpg" width="300" />
+                <p>Taj sharpened with alpha = 1</p>
+            </td>
+            <td>
+                <img src="media/taj_unsharp_mask_alpha5.jpg" width="300" />
+                <p>Taj sharpened with alpha = 5</p>
+            </td>
+            <td>
+                <img src="media/taj_unsharp_mask_alpha10.jpg" width="300" />
+                <p>Taj sharpened with alpha = 10</p>
+            </td>
+            <td>
+                <img src="media/taj_unsharp_mask_alpha20.jpg" width="300" />
+                <p>Taj sharpened with alpha = 20</p>
+            </td>
+
+        </tr>
+    </table>
+    <p>We now repeat the previous process with an image of Taylor Swift (my favorite artist!). First, we demonstrate
+        sharpening by blurring to get the low frequencies, subtracting to get the high frequencies, and adding back to
+        get a sharper image. For all of the following, we use Gaussians of sigma = 5. For all of the following images
+        except the originals, we apply `np.clip` to keep the pixel values between 0 and 1.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/taylorswift1.png" width="300" />
+                <p>Original Taylor Swift</p>
+            </td>
+            <td>
+                <img src="media/blur_ts.jpg" width="300" />
+                <p>Blurring Taylor Swift with the Gaussian (getting low frequencies of the image)</p>
+            </td>
+            <td>
+                <img src="media/high_freqs_ts.jpg" width="300" />
+                <p>Subtracting blurred Taylor Swift from original (getting high frequencies of the image)</p>
+            </td>
+            <td>
+                <img src="media/sharp_ts.jpg" width="300" />
+                <p>Adding high frequencies back in (with the alpha multiple of 1) to the original Taylor Swift</p>
+            </td>
+        </tr>
+    </table>
+    <p>By defining a single unsharp mask filter, we can quickly look at different values for alpha when sharpening the
+        image of Taylor Swift.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/sharp_ts_1.jpg" width="300" />
+                <p>Taylor Swift sharpened with alpha = 1</p>
+            </td>
+            <td>
+                <img src="media/sharp_ts_5.jpg" width="300" />
+                <p>Taylor Swift sharpened with alpha = 5</p>
+            </td>
+            <td>
+                <img src="media/sharp_ts_10.jpg" width="300" />
+                <p>Taylor Swift sharpened with alpha = 10</p>
+            </td>
+            <td>
+                <img src="media/sharp_ts_20.jpg" width="300" />
+                <p>Taylor Swift sharpened with alpha = 20</p>
+            </td>
+
+        </tr>
+    </table>
+    <p>We now look at taking a sharp image, blurring it, and trying to sharpen it again. We first try directly
+        sharpening the blurred image with the unsharp mask filter. For all of the following images except the originals,
+        we apply `np.clip` to keep the pixel values between 0 and 1. For all of the following, we use Gaussians of sigma
+        = 5.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/monkeybaby.jpeg" width="300" />
+                <p>Original baby monkey</p>
+            </td>
+            <td>
+                <img src="media/sharp_mb_1.jpg" width="300" />
+                <p>Sharpened baby monkey (alpha = 1)</p>
+            </td>
+            <td>
+                <img src="media/sharp_blur_mb_1.jpg" width="300" />
+                <p>Sharpened-then-blurred baby monkey</p>
+            </td>
+            <td>
+                <img src="media/sharp_blur_sharp_mb_1.jpg" width="300" />
+                <p>Sharpened-then-blurred-then-sharpened baby monkey (alpha = 1)</p>
+            </td>
+        </tr>
+    </table>
+    <p>We see that sharpening the blurred image does not do a good job of recovering the originally sharpened image nor
+        the original image. This is because when we apply a Gaussian blur (which acts as a lowpass filter), we lose much
+        of the information at the higher frequencies and can no longer recover it since the higher frequencies are
+        attenuated. Even when we try to resharpen the image, much of the information about those higher frequencies has
+        been lost, so resharpening does not do a good job. We can try an alternative strategy where instead of directly
+        sharpening the blurred image, we add back in the high frequencies of the original image.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/high_freqs_mb_2.jpg" width="300" />
+                <p>High frequencies of the original baby monkey (computed by subtracting blurred baby monkey from
+                    original)</p>
+            </td>
+            <td>
+                <img src="media/sharp_blur_mb_1.jpg" width="300" />
+                <p>Sharpened-then-blurred baby monkey</p>
+            </td>
+            <td>
+                <img src="media/sharp_blur_sharp_mb_2.jpg" width="300" />
+                <p>High frequencies added back to sharpened-then-blurred baby monkey (alpha = 1)</p>
+            </td>
+            <td>
+                <img src="media/sharp_blur_sharp_mb_2_alpha2.jpg" width="300" />
+                <p>High frequencies added back to sharpened-then-blurred baby monkey (alpha = 2)</p>
+            </td>
+        </tr>
+    </table>
+
+    <p>We see that by directly adding in the high frequencies, we do a far better job of recovering the original and/or
+        originally sharp monkey baby image. This way, we do not lose the information about the higher frequencies of the
+        image as was happening previously.</p>
+
+
+    <h3>Part 2.2: Hybrid Images</h3>
+    <p>Hybrid images were created by combining the low frequency components of one image with the high frequency
+        components of another image. Low and high frequency components were computed using lowpass (Gaussian) filters
+        and highpass (unit impulse - Gaussian) filters. Hybrid images work because while from close up, we tend to
+        perceive the high frequency components of an image, from far away, we tend to perceive the low frequency
+        components. Because the low and high frequency components of the hybrid image are from two separate images, this
+        makes the image look like two separate images from different distances.</p>
+    <h4>Cillian Murphy (happy and sad)</h4>
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <img src="media/happy_cillian_aligned.jpg" width="200" />
+                <p>Happy Cillian Murphy (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/sad_cillian_aligned.jpg" width="200" />
+                <p>Sad Cillian Murphy (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/happy_cillian_lowpass.jpg" width="200" />
+                <p>Lowpass filter applied to Happy Cillian Murphy (sigma = 6) </p>
+            </td>
+            <td>
+                <img src="media/sad_cillian_highpass.jpg" width="200" />
+                <p>Highpass filter applied to Sad Cillian Murphy (sigma = 10)</p>
+            </td>
+            <td>
+                <img src="media/hybrid_cillian.jpg" width="200" />
+                <p>Hybrid image from the filtered images added together</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="media/fft happy cillian aligned.png" width="200" />
+                <p>FFT plot of Happy Cillian Murphy (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/fft sad cillian aligned.png" width="200" />
+                <p>FFT plot of Sad Cillian Murphy (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/fft happy cillian lowpass.png " width="200" />
+                <p>FFT plot of Lowpass filter applied to Happy Cillian Murphy (sigma = 6) </p>
+            </td>
+            <td>
+                <img src="media/fft sad cillian highpass.png" width="200" />
+                <p>FFT plot of Highpass filter applied to Sad Cillian Murphy (sigma = 10)</p>
+            </td>
+            <td>
+                <img src="media/fft cillian hybrid.png" width="200" />
+                <p>FFT plot of Hybrid image from the filtered images added together</p>
+            </td>
+
+        </tr>
+    </table>
+    <h4>Eagle and monkey</h4>
+    <table>
+        <tr>
+            <td>
+                <img src="media/eagle_aligned.jpg" width="200" />
+                <p>Eagle (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/monkey_aligned.jpg" width="200" />
+                <p>Monkey (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/eagle_lowpass.jpg" width="200" />
+                <p>Lowpass filter applied to eagle (sigma = 3) </p>
+            </td>
+            <td>
+                <img src="media/monkey_highpass.jpg" width="200" />
+                <p>Highpass filter applied to monkey (sigma = 2)</p>
+            </td>
+            <td>
+                <img src="media/monkey_eagle_hybrid.jpg" width="200" />
+                <p>Hybrid image from the filtered images added together</p>
+            </td>
+        </tr>
+    </table>
+    <h4>Happy dog and sad dog (failure)</h4>
+    <table>
+        <tr>
+            <td>
+                <img src="media/happy_dog_aligned.jpg" width="200" />
+                <p>Happy dog (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/sad_dog_aligned.jpg" width="200" />
+                <p>Sad dog (aligned version)</p>
+            </td>
+            <td>
+                <img src="media/happy_dog_lowpass.jpg" width="200" />
+                <p>Lowpass filter applied to happy dog (sigma = 3) </p>
+            </td>
+            <td>
+                <img src="media/sad_dog_highpass.jpg" width="200" />
+                <p>Highpass filter applied to sad dog (sigma = 10)</p>
+            </td>
+            <td>
+                <img src="media/hybrid_dog.jpg" width="200" />
+                <p>Hybrid image from the filtered images added together</p>
+            </td>
+        </tr>
+    </table>
+    <p>The happy and sad dog hybrid image appears to have not worked well. One possible reason for this is because the
+        two images did not align well. Because the dog opens its mouth when happy, this results in a significantly
+        different location of many facial features between the happy and sad dog -- including its nose and particularly,
+        its mouth. This results in the hybrid image appearing unnatural.</p>
+
+    <h3>Part 2.3: Gaussian and Laplacian Stacks</h3>
+
+
+    <p>We compute the Gaussian and Laplacian stacks for the apple and the orange. We compute Gaussian stacks by
+        repeatedly applying the Gaussian filter to the images. We compute Laplacian stacks by subtracting consecutive
+        levels of the Gaussian stack, with the last element of the Laplacian stack simply being the last element of the
+        Gaussian stack. We compute stacks of depth 7 using Gaussian filters of sigma = 5.</p>
+
+
+    <table>
+        <tr>
+            <td>Apple Gaussian Stack</td>
+            <td><img src="media/apple_gaussian_stack.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Apple Laplacian Stack</td>
+            <td><img src="media/apple_laplacian_stack.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Orange Gaussian Stack</td>
+            <td><img src="media/orange_gaussian_stack.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Orange Laplacian Stack</td>
+            <td><img src="media/orange_laplacian_stack.jpg" width="800" /></td>
+        </tr>
+
+    </table>
+
+    <p> We now create a Gaussian stack for the mask. The mask for the oraple is simply all white on the left half and
+        all black on the right half. Again, we use depth of 7 and sigma of 5.</p>
+    <table>
+        <tr>
+            <td>Mask Gaussian Stack</td>
+            <td><img src="media/oraple_mask_gaussian_stack.jpg" width="800" /></td>
+        </tr>
+    </table>
+
+    <p>We apply these masks to the apple and orange Laplacian stacks, and we add together the results to create a
+        Laplacian stack for the oraple. We collapse the Laplacian stack for the oraple by summing the levels up to
+        create the oraple. </p>
+    <table>
+        <tr>
+            <td>Masked Apple Laplacian Stack</td>
+            <td><img src="media/apple_left_masks.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Masked Orange Laplacian Stack</td>
+            <td><img src="media/orange_right_masks.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Oraple Laplacian Stack</td>
+            <td><img src="media/oraple_levels.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Oraple</td>
+            <td><img src="media/oraple.jpg" /></td>
+        </tr>
+    </table>
+
+    Finally, here's a summary of the process, demonstrated by recreating Figure 3.42 from Szelski page 167.
+
+    <table>
+        <thead>
+            <td>Apple</td>
+            <td>Orange</td>
+            <td>Oraple</td>
+        </thead>
+        <tr>
+            <td>
+                Higher frequencies (level = 0)
+            </td>
+            <td>
+                <img src="media/apple_0.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orange_0.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/oraple_0.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Middle frequencies (level = 2)
+            </td>
+            <td>
+                <img src="media/apple_2.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orange_2.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/oraple_2.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Lower frequencies (level = 4)
+            </td>
+            <td>
+                <img src="media/apple_4.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orange_4.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/oraple_4.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Combined from Laplacian stack
+            </td>
+            <td>
+                <img src="media/apple_left.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orange_right.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/oraple.jpg" width="200" />
+            </td>
+        </tr>
+    </table>
+
+
+    <h3>Part 2.4: Multiresolution Blending</h3>
+
+    <h4>Minion-in-the-Sun (Sunion)</h4>
+
+    <p>We used an irregular mask to blend a minion's face with the Sun. We compute the Gaussian and Laplacian stacks for
+        the minion and the Sun. We compute stacks of depth 7 using Gaussian filters of sigma = 5.</p>
+
+    <table>
+        <tr>
+            <td>Minion Gaussian Stack</td>
+            <td><img src="media/minions_gaussian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Minion Laplacian Stack</td>
+            <td><img src="media/minions_laplacian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Sun Gaussian Stack</td>
+            <td><img src="media/sun_gaussian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Sun Laplacian Stack</td>
+            <td><img src="media/sun_laplacian.jpg" width="800" /></td>
+        </tr>
+
+    </table>
+
+    <p> We now create a Gaussian stack for the mask. The mask for the Sunion is all white around the minion's eyes and
+        mouth. Again, we use depth of 7 and sigma of 5.</p>
+    <table>
+        <tr>
+            <td>Mask Gaussian Stack</td>
+            <td><img src="media/minions_mask_gaussian.jpg" width="800" /></td>
+        </tr>
+    </table>
+
+    <p>We apply the mask Gaussian stack to the minion and Sun Laplacian stacks, and we add together the results to
+        create a Laplacian stack for the Sunion. We collapse the Laplacian stack for the Sunion by summing the levels up
+        to create the Sunion. </p>
+    <table>
+        <tr>
+            <td>Masked Minion Laplacian Stack</td>
+            <td><img src="media/minions_laplacian_left.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Masked Sun Laplacian Stack</td>
+            <td><img src="media/sun_laplacian_right.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Sunion Laplacian Stack</td>
+            <td><img src="media/sunion_laplacian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Sunion (we use `np.clip` for this)</td>
+            <td><img src="media/sunion.jpg" /></td>
+        </tr>
+    </table>
+
+    Finally, here's a summary of the process, demonstrated by recreating Figure 10 from the paper.
+
+    <table>
+        <thead>
+            <td>Minion</td>
+            <td>Sun</td>
+            <td>Sunion</td>
+        </thead>
+        <tr>
+            <td>
+                Higher frequencies (level = 0)
+            </td>
+            <td>
+                <img src="media/minions_0.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sun_0.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sunion_0.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Middle frequencies (level = 2)
+            </td>
+            <td>
+                <img src="media/minions_2.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sun_2.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sunion_2.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Lower frequencies (level = 4)
+            </td>
+            <td>
+                <img src="media/minions_4.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sun_4.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sunion_4.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Combined from Laplacian stack
+            </td>
+            <td>
+                <img src="media/minions_left.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sun_right.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/sunion.jpg" width="200" />
+            </td>
+        </tr>
+    </table>
+
+    <h4>Banana-in-Monkey (Monana)</h4>
+
+    <p>We used an irregular mask to blend a banana into the monkey's stomach. We compute the Gaussian and Laplacian stacks for
+        the banana and the monkey. We compute stacks of depth 7 using Gaussian filters of sigma = 5.</p>
+
+    <table>
+        <tr>
+            <td>Banana Gaussian Stack</td>
+            <td><img src="media/banana_gaussian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Banana Laplacian Stack</td>
+            <td><img src="media/banana_laplacian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Monkey Gaussian Stack</td>
+            <td><img src="media/orangutan_gaussian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Monkey Laplacian Stack</td>
+            <td><img src="media/orangutan_laplacian.jpg" width="800" /></td>
+        </tr>
+
+    </table>
+
+    <p> We now create a Gaussian stack for the mask. The mask for the Monana is all white around the banana's region in order to isolate the banana from its background. Again, we use depth of 7 and sigma of 5.</p>
+    <table>
+        <tr>
+            <td>Mask Gaussian Stack</td>
+            <td><img src="media/banana_mask_gaussian.jpg" width="800" /></td>
+        </tr>
+    </table>
+
+    <p>We apply the mask Gaussian stack to the banana and monkey Laplacian stacks, and we add together the results to
+        create a Laplacian stack for the Monana. We collapse the Laplacian stack for the Monana by summing the levels up
+        to create the Monana. </p>
+    <table>
+        <tr>
+            <td>Masked Banana Laplacian Stack</td>
+            <td><img src="media/banana_left_laplacian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Masked Monkey Laplacian Stack</td>
+            <td><img src="media/orangutan_right_laplacian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Monana Laplacian Stack</td>
+            <td><img src="media/monana_laplacian.jpg" width="800" /></td>
+        </tr>
+        <tr>
+            <td>Monana (we use `np.clip` for this)</td>
+            <td><img src="media/monana.jpg" /></td>
+        </tr>
+    </table>
+
+
+    Finally, here's a summary of the process, demonstrated by recreating Figure 10 from the paper.
+
+    <table>
+        <thead>
+            <td>Banana</td>
+            <td>Monkey</td>
+            <td>Monana</td>
+        </thead>
+        <tr>
+            <td>
+                Higher frequencies (level = 0)
+            </td>
+            <td>
+                <img src="media/banana_0.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orangutan_0.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/monana_0.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Middle frequencies (level = 2)
+            </td>
+            <td>
+                <img src="media/banana_2.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orangutan_2.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/monana_2.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Lower frequencies (level = 4)
+            </td>
+            <td>
+                <img src="media/banana_4.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orangutan_4.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/monana_4.jpg" width="200" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Combined from Laplacian stack
+            </td>
+            <td>
+                <img src="media/banana_left.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/orangutan_right.jpg" width="200" />
+            </td>
+            <td>
+                <img src="media/monana.jpg" width="200" />
+            </td>
+        </tr>
+    </table>
+
+    <h2> Miscellaneous Notes </h2>
+    <p> The kernel sizes were chosen to be around 6 * the value of the sigma. </p>
+    <p> For all output images (meaning images excluding original images), we linearly rescale so that the darkest pixel has value 0 and lightest pixel has value 1, unless otherwise noted. A number of images use `np.clip` instead, particularly with the image sharpening section, because `np.clip` tended to provide better results. </p>
+</body>
+
+</html>
