@@ -161,6 +161,7 @@
     </table>
     <h2>Part 2: Fun with Frequencies!</h2>
     <h3>Part 2.1: Image "Sharpening"</h3>
+    <h4>Taj Mahal</h4>
     <p>We first demonstrate the process of sharpening on the picture of the Taj Mahal. We blur the Taj Mahal by applying
         a Gaussian filter to get the low frequencies present in the image, and then subtract this from the original
         image of the Taj Mahal to get the high frequencies in the image. We add back these high frequencies (using an
@@ -211,6 +212,7 @@
 
         </tr>
     </table>
+    <h4>Taylor Swift</h4>
     <p>We now repeat the previous process with an image of Taylor Swift (my favorite artist!). First, we demonstrate
         sharpening by blurring to get the low frequencies, subtracting to get the high frequencies, and adding back to
         get a sharper image. For all of the following, we use Gaussians of sigma = 5. For all of the following images
@@ -258,6 +260,7 @@
 
         </tr>
     </table>
+    <h4>Monkey Baby</h4>
     <p>We now look at taking a sharp image, blurring it, and trying to sharpen it again. We first try directly
         sharpening the blurred image with the unsharp mask filter. For all of the following images except the originals,
         we apply `np.clip` to keep the pixel values between 0 and 1. For all of the following, we use Gaussians of sigma
