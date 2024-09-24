@@ -802,6 +802,9 @@
     <h2> Miscellaneous Notes </h2>
     <p> The kernel sizes were chosen to be around 6 * the value of the sigma. </p>
     <p> For all output images (meaning images excluding original images), we linearly rescale so that the darkest pixel has value 0 and lightest pixel has value 1, unless otherwise noted. A number of images use `np.clip` instead, particularly with the image sharpening section, because `np.clip` tended to provide better results. </p>
+
+    <h2> Most Important Thing from Project </h2>
+    <p> The most important thing I learned from the project is how spatial frequencies affect our perception of an image, and how this really means that perception is all relative. I can see that with the hybrid images for example, where we can create two interpretations of the same image by mixing different frequencies of two images. I can see it also with multiresolution blending, where we take advantage of blending at different frequencies to more seamlessly blend together two images and convince the viewer that it is a single image. </p>
 </body>
 
 </html>
