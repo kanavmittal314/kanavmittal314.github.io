@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project 3</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      td {
+        text-align: center;
+        vertical-align: middle;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Project 3: Face Morphing</h1>
+    <h2>Part 1: Defining Correspondences</h2>
+    <p>
+      I used `plt.ginput` to select corresponding points on both faces. In
+      total, 30 corresponding points were selected -- 3 for each eye, 7 for the
+      nose, 3 for the mouth, 3 for each ear, 3 for each brow, and 2 for the top
+      and bottom of the head. I also automatically added the 4 corners of both
+      images as corresponding points.
+    </p>
+
+    <table>
+      <tr>
+        <td>
+          <img src="./media/moe_resized.jpg" width="300" />
+          <p>
+            Original image of Moe,<br />
+            resized to 750 x 1000
+          </p>
+        </td>
+        <td>
+          <img src="./media/kanav_resized.jpg" width="300" />
+          <p>
+            Original image of Kanav<br />
+            resized to 750 x 1000
+          </p>
+        </td>
+        <td>
+          <img src="./media/moe_with_points.jpg" width="300" />
+          <p>Image of Moe with <br />Moe's annotated facial keypoints</p>
+        </td>
+        <td>
+          <img src="./media/kanav_with_points.jpg" width="300" />
+          <p>Image of Kanav with <br />Kanav's annotated facial keypoints</p>
+        </td>
+      </tr>
+    </table>
+    <p>
+      I then averaged the two sets of facial keypoints to get the average shape
+      of Moe and Kanav. (This was an unweighted average i.e., the weights were
+      each 0.5). I used the `Delaunay` function from scipy to compute a Delaunay
+      triangulation from this average shape, and then I applied the Delaunay
+      triangulation to the images of Moe and Kanav and their facial keypoints.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/moe_with_avg_points.jpg" width="300" />
+          <p>
+            Image of Moe with <br />Moe's average annotated facial keypoints
+          </p>
+        </td>
+        <td>
+          <img src="./media/kanav_with_avg_points.jpg" width="300" />
+          <p>
+            Image of Kanav with <br />Kanav's averaged annotated facial
+            keypoints
+          </p>
+        </td>
+        <td>
+          <img src="./media/moe_with_triangulation.jpg" width="300" />
+          <p>Image of Moe with <br />triangulation from average keypoints</p>
+        </td>
+        <td>
+          <img src="./media/kanav_with_triangulation.jpg" width="300" />
+          <p>Image of Kanav with <br />triangulation from average keypoints</p>
+        </td>
+      </tr>
+    </table>
+    <h2>Part 2: Computing the "Mid-way Face"</h2>
+    <p>
+      For each pair of corresponding triangles in the image of Moe and the
+      midway image, I computed an affine transformation from the corners of the
+      Moe triangle to the midway triangle. (Before computing this affine
+      transformation, I converted the coordinates of the triangle corners to
+      homogenous coordinates.) Once this affine transformation was computed, I
+      used the inverse of the affine transformation to map pixels within the
+      triangle in the midway image (computed using the `polygon` function) to
+      pixels in Moe's image. I used a simple interpolation (rounding down these
+      pixels in Moe's image to an integer) to extract the corresponding colors
+      from Moe's image. By repeating for all pixels in each triangle and for all
+      triangles, I was able to assemble Moe morphed into the midway geometry. I
+      repeated this entire process for the image of Kanav as well.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/moe_resized.jpg" width="300" />
+          <p>
+            Original image of Moe,<br />
+            resized to 750 x 1000
+          </p>
+        </td>
+        <td>
+          <img src="./media/kanav_resized.jpg" width="300" />
+          <p>
+            Original image of Kanav<br />
+            resized to 750 x 1000
+          </p>
+        </td>
+        <td>
+          <img src="./media/moe_morphed_into_midway.jpg" width="300" />
+          <p>Image of Moe morphed <br />into the midway geometry</p>
+        </td>
+        <td>
+          <img src="./media/kanav_morphed_into_midway.jpg" width="300" />
+          <p>Image of Kanav morphed <br />into the midway geometry</p>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Afterwards, I applied a cross-dissolve with the weights as 0.5 for both
+      the morphed Moe and morphed Kanav images from above. This gave me the
+      final midway face:
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/moe_resized.jpg" width="300" />
+          <p>
+            Original image of Moe,<br />
+            resized to 750 x 1000
+          </p>
+        </td>
+        <td>
+          <img src="./media/kanav_resized.jpg" width="300" />
+          <p>
+            Original image of Kanav<br />
+            resized to 750 x 1000
+          </p>
+        </td>
+        <td>
+          <img src="./media/moe_kanav_midway_morphed.jpg" width="300" />
+          <p>
+            Image of midway face between Moe and Kanav.<br />Computed by
+            cross-dissolving.
+          </p>
+        </td>
+      </tr>
+    </table>
+    <h2>Part 3: The Morph Sequence</h2>
+    <p>
+      I generalized the previous logic for the midway face to allow for any
+      `warp_frac` and `dissolve_frac` where `warp_frac` and `dissolve_frac` are
+      parameters between 0 and 1 that control how much warping and
+      cross-dissolving, respectively, is weighted to one image. (Computing the
+      mid-way face involves a both `warp_frac` and `dissolve_frac` of 0.5.)
+      Using this, I was then able to create a morph sequence of 45 frames where
+      `warp_frac` and `dissolve_frac` go from 0 to 1 in 45 equally-spaced
+      intervals (i.e., 0/44, 1/44, 2/44, ..., 43/44, 1).
+    </p>
+    <img src="./media/moe_kanav_morphed.gif" width="300" />
+    <p>
+      <i
+        >GIF showing 45 frames of the morph sequence<br />from Moe to Kanav
+        images</i
+      >
+    </p>
+    <h2>Part 4: The Mean Face of a Population</h2>
+    <p>
+      I chose the Danes dataset. Below is an example of a face from the Danes
+      image, along with the corresponding keypoints. I averaged the keypoints
+      across all faces, and below I also provide an example of the same face
+      with the average keypoints. I repeated the process for both neutral
+      expression and happy expression faces. (Note: for my analysis, I excluded
+      the 2nd, 3rd, and 4th Danish faces since they were in grayscale. This left
+      me with 30 male and 7 female faces, each with neutral and happy expression
+      images.)
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/danes_neutral_with_keypoints.jpg" width="300" />
+          <p>
+            First neutral face within the Danes dataset,<br />
+            annotated with its 58 keypoints
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_with_keypoints.jpg" width="300" />
+          <p>
+            First happy face within the Danes dataset,<br />
+            annotated with its 58 keypoints
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_with_avg_keypoints.jpg" width="300" />
+          <p>
+            First neutral face within the Danes dataset,<br />
+            annotated with the average keypoints
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_with_avg_keypoints.jpg" width="300" />
+          <p>
+            First happy face within the Danes dataset,<br />
+            annotated with the average keypoints
+          </p>
+        </td>
+      </tr>
+    </table>
+    <p>
+      Afterwards, I warped each face within the Danes dataset to the average
+      geometry of the corresponding expression (neutral or happy). From these
+      warped faces, I averaged them together to compute the average neutral or
+      happy Danish face.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/danes_neutral_face_warps_0.jpg" width="300" />
+          <p>
+            First neutral face (male) within the Danes dataset,<br />
+            warped to the average geometry of neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_face_warps_1.jpg" width="300" />
+          <p>
+            Second neutral face (male) within the Danes dataset,<br />
+            warped to the average geometry of neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_face_warps_4.jpg" width="300" />
+          <p>
+            Fifth neutral face (female) within the Danes dataset,<br />
+            warped to the average geometry of neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_avg.jpg" width="300" />
+          <p>Average Danish neutral face</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/danes_happy_face_warps_0.jpg" width="300" />
+          <p>
+            First happy face (male) within the Danes dataset,<br />
+            warped to the average geometry of happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_face_warps_1.jpg" width="300" />
+          <p>
+            Second happy face (male) within the Danes dataset,<br />
+            warped to the average geometry of happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_face_warps_4.jpg" width="300" />
+          <p>
+            Fifth happy face (female) within the Danes dataset,<br />
+            warped to the average geometry of happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_avg.jpg" width="300" />
+          <p>Average Danish happy face</p>
+        </td>
+      </tr>
+    </table>
+    <p>
+      I also repeated the above process, subsetting to males and subsetting to
+      female faces. Here is a summary of the results:
+    </p>
+    <table>
+     
+      <tr>
+        <td>
+          <img src="./media/danes_neutral_male_face_warps_0.jpg" width="300" />
+          <p>
+            First male neutral face within the Danes dataset,<br />
+            warped to the average geometry of male neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_male_face_warps_1.jpg" width="300" />
+          <p>
+            Second male neutral face within the Danes dataset,<br />
+            warped to the average geometry of male neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_male_face_warps_2.jpg" width="300" />
+          <p>
+            Third male neutral face within the Danes dataset,<br />
+            warped to the average geometry of male neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_male_avg.jpg" width="300" />
+          <p>Average Danish male neutral face</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/danes_happy_male_face_warps_0.jpg" width="300" />
+          <p>
+            First male happy face within the Danes dataset,<br />
+            warped to the average geometry of male happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_male_face_warps_1.jpg" width="300" />
+          <p>
+            Second male happy face within the Danes dataset,<br />
+            warped to the average geometry of male happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_male_face_warps_2.jpg" width="300" />
+          <p>
+            Third male happy face within the Danes dataset,<br />
+            warped to the average geometry of male happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_male_avg.jpg" width="300" />
+          <p>Average Danish male happy face</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <img src="./media/danes_neutral_female_face_warps_0.jpg" width="300" />
+          <p>
+            First female neutral face within the Danes dataset,<br />
+            warped to the average geometry of female neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_female_face_warps_1.jpg" width="300" />
+          <p>
+            Second female neutral face within the Danes dataset,<br />
+            warped to the average geometry of female neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_female_face_warps_2.jpg" width="300" />
+          <p>
+            Third female neutral face within the Danes dataset,<br />
+            warped to the average geometry of female neutral faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_neutral_female_avg.jpg" width="300" />
+          <p>Average Danish female neutral face</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/danes_happy_female_face_warps_0.jpg" width="300" />
+          <p>
+            First female happy face within the Danes dataset,<br />
+            warped to the average geometry of female happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_female_face_warps_1.jpg" width="300" />
+          <p>
+            Second female happy face within the Danes dataset,<br />
+            warped to the average geometry of female happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_female_face_warps_2.jpg" width="300" />
+          <p>
+            Third female happy face within the Danes dataset,<br />
+            warped to the average geometry of female happy faces
+          </p>
+        </td>
+        <td>
+          <img src="./media/danes_happy_female_avg.jpg" width="300" />
+          <p>Average Danish female happy face</p>
+        </td>
+      </tr>
+    </table>
+    <p>I then warped my face into the average geometry of Danish neutral males and warped the average Danish neutral male face into my geometry. I selected a similar set of 30 keypoints as described in Part 1 for both my face and the average Danish neutral male face and computed the Delaunay triangulation from the average of these keypoints. (Note: I cropped and resized my picture and the average Danish male picture to match dimensions.)</p>
+    <table>
+        <tr>
+            <td>
+                <img src="./media/average_male_face_resized.jpg" width="300" />
+                <p>
+                  Average Danish neutral male face (cropped and resized)
+                </p>
+              </td>
+              <td>
+                <img src="./media/kanav_resized_avg_male.jpg" width="300" />
+                <p>
+                  Kanav's face (cropped and resized)
+                </p>
+            </td>
+            <td>
+                <img src="./media/avg_male_warped_into_kanav.jpg" width="300" />
+                <p>
+                  Average Danish neutral male face warped into Kanav's geometry
+                </p>
+              </td>
+              <td>
+                <img src="./media/kanav_warped_into_avg_male.jpg" width="300" />
+                <p>
+                  Kanav's face warped into the average Danish neutral male face geometry
+                </p>
+            </td>
+        </tr>
+    </table>
+    <h2>Part 5: Caricatures</h2>
+    <p>I extrapolated from the Danish neutral male population mean. Specifically, I computed a weighted average according to alpha * kanav + (1-alpha) * Danish neutral male population mean, and I set alpha to >1 in order to extrapolate in the direction of Kanav's face.</p>
+    <table>
+        <tr>
+            <td>
+                <img src="./media/kanav_resized_avg_male.jpg" width="300" />
+                <p>
+                  Original Kanav's face
+                </p>
+              </td>
+            <td>
+                <img src="./media/caricature_alpha1.5.jpg" width="300" />
+                <p>
+                  Caricature with alpha = 1.5
+                </p>
+              </td>
+              <td>
+                <img src="./media/caricature_alpha2.jpg" width="300" />
+                <p>
+                    Caricature with alpha = 2
+                </p>
+            </td>
+            <td>
+                <img src="./media/caricature_alpha2.5.jpg" width="300" />
+                <p>
+                    Caricature with alpha = 2.5
+                </p>
+              </td>
+              
+        </tr>
+    </table>
+    <h2>Bells and Whistles</h2>
+    <p>For my bells and whistles, I looked at improving the morphing algorithm by changing the rate of morphing (credit: Max on course staff for inspiration). Specifically, I looked at nonlinear functions to control how `warp_frac` and `dissolve_frac` change. I tried a sigmoid function to decrease the time spent in those awkward middle frames, and as comparison, tried a piecewise function that would instead increase the time spent in those awkward middle frames. </p>
+    <table>
+        <tr>
+            <td>
+                <img src="./media/moe_kanav_morphed.gif" width="300"/>
+                <p>Using the original linear function that maps `warp_frac` and `dissolve_frac`<br/> to 45 evenly spaced numbers in [0, 1].</p>
+            </td>
+            <td>
+                <img src="./media/sigmoidwarp_moe_kanav_morphed.gif" width="300"/>
+                <p>Using a sigmoid function that maps `warp_frac` and `dissolve_frac`<br/>to between sigmoid(-6) and sigmoid(6).<br/>The ends were automatically transformed to 0 and 1.</p>
+            </td>
+            <td>
+                <img src="./media/piecewisewarp_moe_kanav_morphed.gif" width="300"/>
+                <p>Using a piecewise function that grows `warp_frac` and `dissolve_frac`<br/>from 0 to 0.4 over the first third, 0.4 to 0.6 over the next third, and then 0.6 to 1.</p>
+            </td>
+        </tr>
+    </table>
+  </body>
+</html>
