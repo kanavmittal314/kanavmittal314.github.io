@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project 4</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      td {
+        text-align: center;
+        vertical-align: middle;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Project 4: Image Warping and Mosaicing</h1>
+    <h2>Part A1: Shoot the Pictures</h2>
+    <p>
+      I went to multiple spots on campus and clicked a series of pictures at
+      each spot with my phone. I made sure to do my best at fixing the Center of
+      Projection by rotating around the phone camera. Unfortunately, I did not
+      have access to a tripod.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <p>Li Ka Shing</p>
+        </td>
+        <td>
+          <img src="media/lks_left.jpg" width="300" />
+          <p>Original left image</p>
+        </td>
+        <td>
+          <img src="media/lks_middle.jpg" width="300" />
+          <p>Original right image</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Bowles Hall Lounge</p>
+        </td>
+        <td>
+          <img src="media/left edge.jpg" width="300" />
+          <p>Original left image</p>
+        </td>
+        <td>
+          <img src="media/left center.jpg" width="300" />
+          <p>Original right image</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Greek Theater View</p>
+        </td>
+        <td>
+          <img src="media/greek1.jpg" width="300" />
+          <p>Original left image</p>
+        </td>
+        <td>
+          <img src="media/greek2.jpg" width="300" />
+          <p>Original right image</p>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Part A2: Recover Homographies</h2>
+    <p>
+      When trying to recover the homography transformation from one image to the
+      other, I manually selected corresponding points in both images. The idea
+      is that if H is a 3x3 matrix that represents the homography
+      transformation, and p and p' represent the pairs of corresponding points
+      in homogenous coordinates, Hp ≈ p'. That is, H should approximately
+      transform points in one image to the other image. Ideally, H would exactly
+      transform the points, but due to noise, it is often infeasible to find a
+      suitable H that does this. Because of noise when selecting corresponding
+      points, we prefer to select more than the minimum 4 corresponding points
+      needed to solve for the homography. We end up with an overdetermined
+      system that may have no exact solution, but we can find a good solution
+      for H using least squares.
+    </p>
+
+    <p>
+      We set up a least squares equation to solve for the entries of H. Note
+      that there are 8 unknowns because we can fix the 9th entry of H
+      (lower-right) to be 1. Once we solve for these entries, we reconstruct H.
+    </p>
+    <img src="media/homography_explanation.jpeg" />
+    <h2>Part A3: Rectification</h2>
+    <p>
+      Using our tool to recover the homography transformation, we can now
+      rectify images! An object that is rectangular in nature may appear as a
+      trapezoid in an image if the image is taken from an angle. We can compute
+      the homography transformation to transform the perspective of the object
+      from an angle (appearing trapezoidal) to straight on (appearing
+      rectangular). This rectifies the image.
+    </p>
+
+    <p>
+      In order to compute the homography, we must use corresponding points. We
+      select the corners of the image in the original image and then set the
+      corresponding points in the target image to make the shape of a rectangle.
+      For the Ticket to Ride one below, we use [(500, 500), (2500, 500), (2500,
+      2500), (500, 2500)]. For Calvin and Hobbes, we use [(100, 100), (1100,
+      100), (1100, 1500), (100, 1500)]
+    </p>
+
+    <table>
+      <tr>
+        <td>
+          <img src="media/ticket_resized_more.jpg" width="300" />
+          <p>Original image, taken from an angle</p>
+        </td>
+        <td>
+          <img src="media/ticket_resized_more_with_points.jpg" width="300" />
+          <p>Original image, with corner points marked</p>
+        </td>
+        <td>
+          <img src="media/ticket_rectified.jpg" width="300" />
+          <p>
+            Rectified image by computing homography <br />
+            and warping image
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="media/calvinhobbes.jpg" width="300" />
+          <p>Original image, taken from an angle</p>
+        </td>
+        <td>
+          <img src="media/calvinhobbes_with_points.jpg" width="300" />
+          <p>Original image, with corner points marked</p>
+        </td>
+        <td>
+          <img src="media/calvinhobbes_rectified.jpg" width="300" />
+          <p>
+            Rectified image by computing homography <br />
+            and warping image
+          </p>
+        </td>
+      </tr>
+    </table>
+    <h2>Part A4: Blending Mosaics</h2>
+
+    <p>
+      We blended mosaics by first warping one image using a homography
+      transformation. This way, we change its perspective to that of the second
+      image. Next, we align the two images together based on two
+      manually-selected corresponding points in each image. We then superimpose
+      the two images on top of each other, applying an alpha weighting.
+    </p>
+    <p>
+      The alpha weighting is computed as follows. Starting from the center
+      x-coordinate of each image and horizontally towards the direction of
+      overlap, we linearly decrease our alpha parameter from 1 to 0, thus slowly
+      darkening the image as we progress towards the region of overlap. This
+      means that the "influence" of an image on the overall mosaic will decrease
+      as we get further from the image and closer to the other image. After
+      superimposing the two images, we experiment with rescaling or clipping in
+      the overlapped region in order to produce the best results. (Note: there
+      are some alignment issues likely due to error when clicking the pictures
+      and imprecision when selecting points with which to align images)
+    </p>
+
+    <h3>Li Ka Shing</h3>
+    Stitched together two images showing different views of Li Ka Shing and
+    surrounding buildings.
+    <table>
+      <tr>
+        <td>
+          <img src="media/lks_left_with_points.jpg" width="300" />
+          <p>Original left image with <br />correspondences selected</p>
+        </td>
+        <td>
+          <img src="media/lks_center_with_points.jpg" width="300" />
+          <p>
+            Original right image with <br />
+            correspondences selected
+          </p>
+        </td>
+
+        <td>
+          <img src="media/lks_left_to_center_warped.jpg" width="300" />
+          <p>Left image warped to the right homography</p>
+        </td>
+        <td>
+          <img src="media/lks_mosaic_new.jpg" width="400" />
+          <p>
+            Mosaic formed by blending <br />
+            (with a bit cropped on left due to <br />
+            alignment issues )
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <h3>Bowles Hall Lounge</h3>
+    Stitched together two images showing different views of the lounge at Bowles
+    Hall (my dorm!)
+    <table>
+      <tr>
+        <td>
+          <img src="media/bowles_leftedge_with_points.jpg" width="300" />
+          <p>Original left image with <br />correspondences selected</p>
+        </td>
+        <td>
+          <img src="media/bowles_leftcenter_with_points.jpg" width="300" />
+          <p>
+            Original right image with <br />
+            correspondences selected
+          </p>
+        </td>
+
+        <td>
+          <img src="media/left_edge_warped.jpg" width="300" />
+          <p>Left image warped to the right homography</p>
+        </td>
+        <td>
+          <img src="media/bowles panorama.jpg" width="400" />
+          <p>Mosaic formed by blending</p>
+        </td>
+      </tr>
+    </table>
+
+    <h3>SF View from Greek Theater</h3>
+    Stitched together two images from up behind the Greek Theater, showing a
+    beautiful sunset view of Berkeley and SF
+    <table>
+      <tr>
+        <td>
+          <img src="media/greek1_with_points.jpg" width="300" />
+          <p>Original left image with <br />correspondences selected</p>
+        </td>
+        <td>
+          <img src="media/greek2_with_points.jpg" width="300" />
+          <p>
+            Original right image with <br />
+            correspondences selected
+          </p>
+        </td>
+
+        <td>
+          <img src="media/greek_1_to_2_warped.jpg" width="300" />
+          <p>Left image warped to the right homography</p>
+        </td>
+        <td>
+          <img src="media/greek_mosaic.jpg" width="400" />
+          <p>
+            Mosaic formed by blending <br />
+            (Cropped out the top of image <br />
+            because no correspondences selected there)
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
