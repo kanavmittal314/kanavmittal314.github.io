@@ -15,8 +15,8 @@
     </style>
   </head>
   <body>
-    <h1>Project 4: Image Warping and Mosaicing</h1>
-    <h2>Part A1: Shoot the Pictures</h2>
+    <h1>Project 4A: Image Warping and Mosaicing</h1>
+    <h2>Part 1: Shoot the Pictures</h2>
     <p>
       I went to multiple spots on campus and clicked a series of pictures at
       each spot with my phone. I made sure to do my best at fixing the Center of
@@ -65,7 +65,7 @@
       </tr>
     </table>
 
-    <h2>Part A2: Recover Homographies</h2>
+    <h2>Part 2: Recover Homographies</h2>
     <p>
       When trying to recover the homography transformation from one image to the
       other, I manually selected corresponding points in both images. The idea
@@ -87,7 +87,14 @@
       (lower-right) to be 1. Once we solve for these entries, we reconstruct H.
     </p>
     <img src="media/homography_explanation.jpeg" />
-    <h2>Part A3: Rectification</h2>
+
+    <h3>Part 3: Warp the Images</h3>
+    <p>
+      We warp the left image to the perspective of the right image by applying a
+      homography transformation to the points in the left image. We specifically
+      do an inverse warp and interpolate pixel values in the resulting image.
+    </p>
+    <h2>Part 4: Rectification</h2>
     <p>
       Using our tool to recover the homography transformation, we can now
       rectify images! An object that is rectangular in nature may appear as a
@@ -142,26 +149,21 @@
         </td>
       </tr>
     </table>
-    <h2>Part A4: Blending Mosaics</h2>
+    <h2>Part 5: Blending Mosaics</h2>
 
     <p>
-      We blended mosaics by first warping one image using a homography
+      We generated mosaics by first warping one image using a homography
       transformation. This way, we change its perspective to that of the second
-      image. Next, we align the two images together based on two
-      manually-selected corresponding points in each image. We then superimpose
-      the two images on top of each other, applying an alpha weighting.
+      image. We then overlay the two images, making sure to apply the same shift
+      computed from warping the first image to the second image.
     </p>
     <p>
-      The alpha weighting is computed as follows. Starting from the center
-      x-coordinate of each image and horizontally towards the direction of
-      overlap, we linearly decrease our alpha parameter from 1 to 0, thus slowly
-      darkening the image as we progress towards the region of overlap. This
-      means that the "influence" of an image on the overall mosaic will decrease
-      as we get further from the image and closer to the other image. After
-      superimposing the two images, we experiment with rescaling or clipping in
-      the overlapped region in order to produce the best results. (Note: there
-      are some alignment issues likely due to error when clicking the pictures
-      and imprecision when selecting points with which to align images)
+      We then use alpha-blending to blend the seams together. The technique we
+      choose to use includes first extract the region of overlap betwen the two
+      images. We then create an alpha parameter that linearly decreases from 1
+      to 0 as we go horizontally across this region of overlap. This serves to
+      linearly reduce the influence of the left image and linearly increase the
+      influence of the right image as we go across.
     </p>
 
     <h3>Li Ka Shing</h3>
@@ -170,11 +172,11 @@
     <table>
       <tr>
         <td>
-          <img src="media/lks_left_with_points.jpg" width="300" />
+          <img src="media/lks_left_with_points.jpg" height="400" />
           <p>Original left image with <br />correspondences selected</p>
         </td>
         <td>
-          <img src="media/lks_center_with_points.jpg" width="300" />
+          <img src="media/lks_center_with_points.jpg" height="400" />
           <p>
             Original right image with <br />
             correspondences selected
@@ -182,15 +184,13 @@
         </td>
 
         <td>
-          <img src="media/lks_left_to_center_warped.jpg" width="300" />
+          <img src="media/lks_left_to_center_warped.jpg" height="400" />
           <p>Left image warped to the right homography</p>
         </td>
         <td>
-          <img src="media/lks_mosaic_new.jpg" width="400" />
+          <img src="media/lks_mosaic_4a.jpg" height="400" />
           <p>
-            Mosaic formed by blending <br />
-            (with a bit cropped on left due to <br />
-            alignment issues )
+            Mosaic formed by blending 
           </p>
         </td>
       </tr>
@@ -202,11 +202,11 @@
     <table>
       <tr>
         <td>
-          <img src="media/bowles_leftedge_with_points.jpg" width="300" />
+          <img src="media/bowles_leftedge_with_points.jpg" height="400" />
           <p>Original left image with <br />correspondences selected</p>
         </td>
         <td>
-          <img src="media/bowles_leftcenter_with_points.jpg" width="300" />
+          <img src="media/bowles_leftcenter_with_points.jpg" height="400"/>
           <p>
             Original right image with <br />
             correspondences selected
@@ -214,11 +214,11 @@
         </td>
 
         <td>
-          <img src="media/left_edge_warped.jpg" width="300" />
+          <img src="media/left_edge_warped.jpg" height="400" />
           <p>Left image warped to the right homography</p>
         </td>
         <td>
-          <img src="media/bowles panorama.jpg" width="400" />
+          <img src="media/bowles_mosaic_4a.jpg" height="400" />
           <p>Mosaic formed by blending</p>
         </td>
       </tr>
@@ -230,11 +230,11 @@
     <table>
       <tr>
         <td>
-          <img src="media/greek1_with_points.jpg" width="300" />
+          <img src="media/greek1_with_points.jpg" height="400" />
           <p>Original left image with <br />correspondences selected</p>
         </td>
         <td>
-          <img src="media/greek2_with_points.jpg" width="300" />
+          <img src="media/greek2_with_points.jpg" height="400" />
           <p>
             Original right image with <br />
             correspondences selected
@@ -242,18 +242,284 @@
         </td>
 
         <td>
-          <img src="media/greek_1_to_2_warped.jpg" width="300" />
+          <img src="media/greek_1_to_2_warped.jpg" height="400" />
           <p>Left image warped to the right homography</p>
         </td>
         <td>
-          <img src="media/greek_mosaic.jpg" width="400" />
+          <img src="media/greek_mosaic_4a.jpg" height="400" />
           <p>
             Mosaic formed by blending <br />
-            (Cropped out the top of image <br />
-            because no correspondences selected there)
           </p>
         </td>
       </tr>
     </table>
+    <h1>Project 4B: Feature Matching for Autostitching</h1>
+    <h2>Part 1: Harris Interest Point Detector</h2>
+    <h
+      >In order to get a set of candidate interest points, we looked at
+      detecting Harris interest points (i.e., corners) in the images. We compute
+      the corner strength function and find points that are a maximum within a
+      small radius of 1 px. This essentially means we are looking for points
+      that are bigger than their neighbors.</h
+    >
+
+    <table>
+      <tr>
+        <td>
+          <img src="./media/lks_left_identified_corners.jpg" width="300" />
+          <p>Detected Harris corners <br />in the left Li Ka Shing image</p>
+        </td>
+        <td>
+          <img src="./media/lks_right_identified_corners.jpg" width="300" />
+          <p>Detected Harris corners <br />in the right Li Ka Shing image</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/bowles_left_identified_corners.jpg" width="300" />
+          <p>Detected Harris corners <br />in the left Bowles Hall image</p>
+        </td>
+        <td>
+          <img src="./media/bowles_right_identified_corners.jpg" width="300" />
+          <p>Detected Harris corners <br />in the right Bowles Hall image</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/greek_left_identified_corners.jpg" width="300" />
+          <p>Detected Harris corners <br />in the left Greek Theater image</p>
+        </td>
+        <td>
+          <img src="./media/greek_right_identified_corners.jpg" width="300" />
+          <p>Detected Harris corners <br />in the right Greek Theater image</p>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Part 2: Adaptive Non-Maximal Suppression</h2>
+
+    <p>
+      We apply adaptive non-maximal suppression (ANMS) in order to reduce the
+      number of interest points so that we can speed up downstream calculations
+      like feature matching. Adaptive non-maximal suppression helps us do this
+      and also maintains good coverage of the image, rather than concentrating
+      interest points in just one part. This is because ANMS factors in the
+      distance from one peak to other peaks.
+    </p>
+    <p>
+      Our algorithm works as follows. For each interest point, we consider all
+      points whose corner strength times c_robust (set to 0.9) exceeds the
+      corner strength of the interest point in question. Then, we compute the
+      closest distance of these much stronger interest points to our interest
+      point in question -- that is our suppression radius. We then pick the top
+      k interest points with the highest suppression radii. This essentially
+      allows us to pick interest points that are far enough from bigger interest
+      points.
+    </p>
+    <p>For all of the following, we look to pick 500 interest points.</p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/lks_left_anms_corners.jpg" width="300" />
+          <p>
+            ANMS applied to detected Harris corners<br />
+            in the left Li Ka Shing image
+          </p>
+        </td>
+        <td>
+          <img src="./media/lks_right_anms_corners.jpg" width="300" />
+          <p>
+            ANMS applied to detected Harris corners<br />
+            in the right Li Ka Shing image
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/bowles_left_anms_corners.jpg" width="300" />
+          <p>
+            ANMS applied to detected Harris corners<br />
+            in the left Bowles Hall image
+          </p>
+        </td>
+        <td>
+          <img src="./media/bowles_right_anms_corners.jpg" width="300" />
+          <p>
+            ANMS applied to detected Harris corners<br />
+            in the right Bowles Hall image
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/greek_left_anms_corners.jpg" width="300" />
+          <p>
+            ANMS applied to detected Harris corners<br />
+            in the left Greek Theater image
+          </p>
+        </td>
+        <td>
+          <img src="./media/greek_right_anms_corners.jpg" width="300" />
+          <p>
+            ANMS applied to detected Harris corners<br />
+            in the right Greek Theater image
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Part 3: Feature Descriptor Extraction</h2>
+
+    <p>
+      Around each of the interest points, we extract a 40 by 40 window. We then
+      subsample every 5th pixel in this 40 by 40 window to end up with an 8 by 8
+      subsampled feature descriptor. We then bias/gain-normalize the feature
+      descriptors.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/lks_left_feature_descriptor.jpg" width="300" />
+          <p>Feature descriptor extracted <br />from Li Ka Shing left image</p>
+        </td>
+        <td>
+          <img src="./media/bowles_right_feature_descriptor.jpg" width="300" />
+          <p>Feature descriptor extracted <br />from Bowles right image</p>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Part 4: Feature Matching</h2>
+    <p>
+      For each pair of features in the two images, we compute the error (using
+      squared L2 distance) if we matched those features. Then, for each feature,
+      we can find the 1st and 2nd nearest neighbors (i.e., features in the other
+      image that give the lowest error). We apply Lowe's trick, rejecting those
+      features whose ratios are above a certain threshold (we chose a threshold
+      of 0.6) -- what we ideally want is features with a much lower distance to
+      first neighbor than second neighbor since this indicates a good match was
+      found. Out of the remaining features, we match them with their 1st nearest
+      neighbor, and we only keep mutual matches.
+    </p>
+
+    <table>
+      <tr>
+        <td><img src="./media/lks_matches.jpg" /></td>
+        <td><p>Feature matches for Li Ka Shing images</p></td>
+      </tr>
+      <tr>
+        <td><img src="./media/bowles_matches.jpg" /></td>
+        <td><p>Feature matches for Bowles Hall images</p></td>
+      </tr>
+      <tr>
+        <td><img src="./media/greek_matches.jpg" /></td>
+        <td><p>Feature matches for Greek Theater images</p></td>
+      </tr>
+    </table>
+
+    <h2>Part 5: RANSAC</h2>
+    <p>
+      There may still be outliers even after matching features, applying Lowe's
+      trick, and rejecting asymmetries. We can compute a homography estimate
+      with the Random Sample Consensus (RANSAC) method. We randomly sample four
+      matches and compute a homography estimate from these. Then, for this
+      homography estimate, we count the number of inliers among the entire data
+      set of matches. Specifically, we look for matches that are modeled by the
+      homography estimate, within an error threshold of 2px. We repeat for
+      10,000 iterations and keep track of the maximum set of inliers found. We
+      then re-compute a homography estimate from the maximum set of inliers.
+    </p>
+    <p>
+      We use this homography estimate to warp the left images to the right, and
+      then we stitch the images together. When stitching images together, we use
+      alpha-blending where in the region of overlap, we linearly decrease the
+      influence of the left image and linearly increase the influence of the
+      right image as we move from left to right.
+    </p>
+
+    <table>
+      <tr>
+        <td>
+          <img src="./media/lks_left_downscaled_warped_4b.jpg" height="400" />
+          <p>
+            Left Li Ka Shing image warped <br />
+            using homography computed by RANSAC
+          </p>
+        </td>
+        <td>
+          <img src="./media/lks_right_downscaled_4b.jpg" height="400" />
+          <p>Right Li Ka Shing image</p>
+        </td>
+        <td>
+          <img src="./media/lks_mosaic_4b.jpg" height="400" />
+          <p>
+            Warped left and regular right Li Ka Shing image <br />
+            stitched together and blended with alpha-blending
+          </p>
+        </td>
+        <td>
+          <img src="./media/lks_mosaic_4a.jpg" height="400"/>
+          <p>Manually-stitched Li Ka Shing mosaic from Part A</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img
+            src="./media/bowles_left_downscaled_warped_4b.jpg"
+            height="400"
+          />
+          <p>
+            Left Bowles Hall image warped <br />
+            using homography computed by RANSAC
+          </p>
+        </td>
+        <td>
+          <img src="./media/bowles_right_downscaled_4b.jpg" height="400" />
+          <p>Right Bowles Hall image</p>
+        </td>
+        <td>
+          <img src="./media/bowles_mosaic_4b.jpg" height="400" />
+          <p>
+            Warped left and regular right Bowles Hall image <br />
+            stitched together and blended with alpha-blending
+          </p>
+        </td>
+        <td>
+          <img src="./media/bowles_mosaic_4a.jpg" height="400"/>
+          <p>Manually-stitched Bowles mosaic from Part A</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/greek_left_downscaled_warped_4b.jpg" height="400" />
+          <p>
+            Left Greek image warped <br />
+            using homography computed by RANSAC
+          </p>
+        </td>
+        <td>
+          <img src="./media/greek_right_downscaled_4b.jpg" height="400" />
+          <p>Right Greek image</p>
+        </td>
+        <td>
+          <img src="./media/greek_mosaic_4b.jpg" height="400" />
+          <p>
+            Warped left and regular right Greek image <br />
+            stitched together and blended with alpha-blending
+          </p>
+        </td>
+        <td>
+          <img src="./media/greek_mosaic_4a.jpg" height="400"/>
+          <p>Manually-stitched Greek mosaic from Part A</p>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Coolest Thing Learned</h2>
+    <p>
+      The coolest thing I learned is RANSAC. It's so incredible that a simple
+      randomized algorithm is able to completely get rid of outliers (not just
+      reduce the influence of outliers) that can drastically affect our result.
+    </p>
   </body>
 </html>
