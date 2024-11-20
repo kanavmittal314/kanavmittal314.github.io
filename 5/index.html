@@ -414,7 +414,7 @@
         </td>
         <td>
           <img src="./media/sdedit nuggets 20.png" width="200px" />
-          <p>SDEdit with i_start = 20<b r />given nuggets</p>
+          <p>SDEdit with i_start = 20<br />given nuggets</p>
         </td>
         <td>
           <img src="./media/nuggets.png" width="200px" />
@@ -638,8 +638,9 @@
     <ul>
       <li>text prompt = "a rocket ship" and original image = campanile</li>
       <li>text prompt = "a photo of a dog" and original image = sun</li>
-      <li>text prompt = "a lithograph of waterfalls" and original image = yosemite</li>
-
+      <li>
+        text prompt = "a lithograph of waterfalls" and original image = yosemite
+      </li>
     </ul>
     <table>
       <tr>
@@ -735,10 +736,18 @@
     </table>
     <h3>1.8 Visual Anagrams</h3>
 
-    <p>Now, we try to create visual anagrams that look like two different images depending on if it is viewed from the top or bottom. This is done by computing a regular CFG noise estimate with one prompt but then also computing the CFG noise estimate with the other prompt of the flipped image and then flipping that noise estimate. We average the two noise estimates together to get the noise estimate used for iterative denoising. In formulas: </p>
-    <img src="./media/anagrams formula.png"/>
-    
-    <p>Here are some results along with the two prompts used. </p>
+    <p>
+      Now, we try to create visual anagrams that look like two different images
+      depending on if it is viewed from the top or bottom. This is done by
+      computing a regular CFG noise estimate with one prompt but then also
+      computing the CFG noise estimate with the other prompt of the flipped
+      image and then flipping that noise estimate. We average the two noise
+      estimates together to get the noise estimate used for iterative denoising.
+      In formulas:
+    </p>
+    <img src="./media/anagrams formula.png" />
+
+    <p>Here are some results along with the two prompts used.</p>
     <table>
       <tr>
         <td>
@@ -791,12 +800,23 @@
     </table>
     <h3>1.9 Hybrid Images</h3>
 
-    <p>We can also create hybrid images using a similar technique as visual anagrams. Here, instead of flipping the noise estimates, we can apply lowpass and highpass filters to the noise estimates. We get the two CFG noise estimates for each of the prompts. For one prompt, we apply a lowpass filter, and for the other, we apply a highpass filter to the noise estimates. We then add together the noise estimates to obtain a noise estimate used for iterative denoising. In formulas:</p>
+    <p>
+      We can also create hybrid images using a similar technique as visual
+      anagrams. Here, instead of flipping the noise estimates, we can apply
+      lowpass and highpass filters to the noise estimates. We get the two CFG
+      noise estimates for each of the prompts. For one prompt, we apply a
+      lowpass filter, and for the other, we apply a highpass filter to the noise
+      estimates. We then add together the noise estimates to obtain a noise
+      estimate used for iterative denoising. In formulas:
+    </p>
 
-    <img src="./media/hybrid formulas.png"/>
-    <p>In our implementation, we use a Gaussian filter of kernel_size=33 and sigma=2 for computing the lowpass and highpass results.</p>
-    
-    <p>Here are some results. </p>
+    <img src="./media/hybrid formulas.png" />
+    <p>
+      In our implementation, we use a Gaussian filter of kernel_size=33 and
+      sigma=2 for computing the lowpass and highpass results.
+    </p>
+
+    <p>Here are some results.</p>
     <table>
       <tr>
         <td>
@@ -817,10 +837,19 @@
     <h1>Project 5B: Diffusion Models from Scratch!</h1>
     <h2>Part 1: Training a Single-Step Denoising UNet</h2>
     <h3>1.1 Implementing the UNet</h3>
-    <p>We implement the UNet using simple operations like Conv, DownConv, UpConv, Flatten, Unflatten, and Concat and composed operations like ConvBlock, DownBlock, and UpBlock. Here is the architecture we use: </p>
-    <img src="./media/unconditional_arch.png" width="600px"/>
+    <p>
+      We implement the UNet using simple operations like Conv, DownConv, UpConv,
+      Flatten, Unflatten, and Concat and composed operations like ConvBlock,
+      DownBlock, and UpBlock. Here is the architecture we use:
+    </p>
+    <img src="./media/unconditional_arch.png" width="600px" />
     <h3>1.2 Using the UNet to Train a Denoiser</h3>
-    <p>We can train a denoiser that can predict the clean image from a noisy image. To get data to train this denoiser, we take the MNIST digit dataset, and for each image in the dataset, we add noise to it. We can add varying levels of noise, dictated by the sigma parameter, as shown below. </p>
+    <p>
+      We can train a denoiser that can predict the clean image from a noisy
+      image. To get data to train this denoiser, we take the MNIST digit
+      dataset, and for each image in the dataset, we add noise to it. We can add
+      varying levels of noise, dictated by the sigma parameter, as shown below.
+    </p>
     <table>
       <tr>
         <td>
@@ -833,7 +862,12 @@
     <p>We eventually train just for sigma = 0.5.</p>
     <h4>1.2.1 Training</h4>
 
-    <p>We train the UNet on the MNIST training dataset, generating noisy images using sigma=0.5. We use a hidden dimension in our architecture of 128. We use the Adam optimizer with learning rate=1e-4. We use a batch_size of 256 and train for 5 epochs. Here are our training losses over 5 epochs: </p>
+    <p>
+      We train the UNet on the MNIST training dataset, generating noisy images
+      using sigma=0.5. We use a hidden dimension in our architecture of 128. We
+      use the Adam optimizer with learning rate=1e-4. We use a batch_size of 256
+      and train for 5 epochs. Here are our training losses over 5 epochs:
+    </p>
 
     <table>
       <tr>
@@ -846,7 +880,13 @@
       </tr>
     </table>
 
-    <p>Then, we tested our model on digits from the test set, and we qualitatively looked at how well our model could recover the images noised with sigma=0.5. It seems to do reasonably well. We test using both the model after 1 epoch of training and after all 5 epochs of training -- the model after all 5 epochs seems to do a little better. </p>
+    <p>
+      Then, we tested our model on digits from the test set, and we
+      qualitatively looked at how well our model could recover the images noised
+      with sigma=0.5. It seems to do reasonably well. We test using both the
+      model after 1 epoch of training and after all 5 epochs of training -- the
+      model after all 5 epochs seems to do a little better.
+    </p>
     <table>
       <tr>
         <td>
@@ -863,7 +903,12 @@
     </table>
     <h4>1.2.2 Out-of-Distribution Testing</h4>
 
-    <p>We also look at how well our denoising model does for other values of sigma that it was not trained for. From the below results, it appears that the denoising model does decently for other values of sigma, except for sigma=1.0. </p>
+    <p>
+      We also look at how well our denoising model does for other values of
+      sigma that it was not trained for. From the below results, it appears that
+      the denoising model does decently for other values of sigma, except for
+      sigma=1.0.
+    </p>
     <table>
       <tr>
         <td>
@@ -875,15 +920,29 @@
 
     <h2>Part 2: Training a Diffusion Model</h2>
     <h3>2.1 Adding Time Conditioning to UNet</h3>
-    <p>Now, we look at implementing DDPM. To do so, we first must inject the timestep t into our architecture. We use linear layers composed in an FCBlock to do so, and add these FCBlocks into our architecture as follows: </p>
-    <img src="./media/conditional_arch.png"  width="600px"/>
+    <p>
+      Now, we look at implementing DDPM. To do so, we first must inject the
+      timestep t into our architecture. We use linear layers composed in an
+      FCBlock to do so, and add these FCBlocks into our architecture as follows:
+    </p>
+    <img src="./media/conditional_arch.png" width="600px" />
     <h3>2.2 Training the UNet</h3>
-    <p>We train the time-conditioned UNet with the help of the following algorithm: Now, instead of predicting the clean image from a noisy image, we aim to predict how much noise was added to the image from a noisy image. In our algorithm, we take clean images, noise it, predict the noise added, and then compute the loss with the actual noise added. </p>
+    <p>
+      We train the time-conditioned UNet with the help of the following
+      algorithm. Now, instead of predicting the clean image from a noisy image,
+      we aim to predict how much noise was added to the image from a noisy
+      image. In our algorithm, we take clean images, noise it, predict the noise
+      added, and then compute the loss with the actual noise added.
+    </p>
 
-    <img src="./media/algo1_t_only.png"width="600px"/>
+    <img src="./media/algo1_t_only.png" width="600px" />
 
-    <p>We train with hidden dimension=64, batch_size=128, and over 20 epochs. We also use an Adam optimizer with initial learning rate=1e-3 and use an exponential learning rate decay scheduler that we step every epoch. </p>
-    <p>Here are our training losses. </p>
+    <p>
+      We train with hidden dimension=64, batch_size=128, and over 20 epochs. We
+      also use an Adam optimizer with initial learning rate=1e-3 and use an
+      exponential learning rate decay scheduler that we step every epoch.
+    </p>
+    <p>Here are our training losses.</p>
     <table>
       <tr>
         <td>
@@ -894,10 +953,17 @@
     </table>
 
     <h3>2.3 Sampling from the UNet</h3>
-    <p>Once we train our time-conditioned UNet, we can sample from it. We use the following algorithm to accomplish iterative denoising. </p>
-    <img src="./media/algo2_t_only.png" width="600px"/>
+    <p>
+      Once we train our time-conditioned UNet, we can sample from it. We use the
+      following algorithm to accomplish iterative denoising.
+    </p>
+    <img src="./media/algo2_t_only.png" width="600px" />
 
-    <p>We sample results from our model after training for 5 epochs and training for 20 epochs. We see that after training for 20 epochs, our model produces more coherent images of digits.</p>
+    <p>
+      We sample results from our model after training for 5 epochs and training
+      for 20 epochs. We see that after training for 20 epochs, our model
+      produces more coherent images of digits.
+    </p>
     <table>
       <tr>
         <td>
@@ -915,10 +981,22 @@
 
     <h3>2.4 Adding Class-Conditioning to UNet</h3>
 
-    <p>Now, we work to add class-conditioning to our time-conditioned UNet so that we can generate an image of a specific digit. To do so, we inject the class into the architecture at similar places as where we injected the timestep. We fetch classes as well from the MNIST dataset, and then pass in a one-hot vector representing the class into our network. With probability p_uncond = 0.1, we zero out this class conditioning vector so that our UNet will work without being conditioned on the class. Here is the algorithm: </p>
-    <img src="./media/algo3_c.png" width="600px"/>
+    <p>
+      Now, we work to add class-conditioning to our time-conditioned UNet so
+      that we can generate an image of a specific digit. To do so, we inject the
+      class into the architecture at similar places as where we injected the
+      timestep. We fetch classes as well from the MNIST dataset, and then pass
+      in a one-hot vector representing the class into our network. With
+      probability p_uncond = 0.1, we zero out this class conditioning vector so
+      that our UNet will work without being conditioned on the class. Here is
+      the algorithm:
+    </p>
+    <img src="./media/algo3_c.png" width="600px" />
 
-    <p>We train with the same hyperparameters as before. Here is the training loss curve: </p>
+    <p>
+      We train with the same hyperparameters as before. Here is the training
+      loss curve:
+    </p>
     <table>
       <tr>
         <td>
@@ -929,11 +1007,17 @@
     </table>
 
     <h3>2.5 Sampling from the Class-Conditioned UNet</h3>
-    <p>Once we train our class-conditioned UNet, we can sample from it. We use CFG so that our outputs will look more like the desired class. The unconditional is a zeroed-out class vector, while the conditional is the one-hot class vector of the desired class. Here is the algorithm we follow: </p>
+    <p>
+      Once we train our class-conditioned UNet, we can sample from it. We use
+      CFG so that our outputs will look more like the desired class. The
+      unconditional is a zeroed-out class vector, while the conditional is the
+      one-hot class vector of the desired class. Here is the algorithm we
+      follow:
+    </p>
 
-    <img src="./media/algo4_c.png" width="600px"/>
+    <img src="./media/algo4_c.png" width="600px" />
 
-    <p>We use a guidance scale of gamma = 5</p>
+    <p>We use a guidance scale of gamma = 5 when sampling. We see that sampling from both the 5th and 20th epoch produces good results, with the 20th epoch's generated images being slightly higher-quality and sharper. </p>
     <table>
       <tr>
         <td>
