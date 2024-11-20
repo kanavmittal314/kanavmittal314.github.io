@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Project 5</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      td {
+        text-align: center;
+        vertical-align: middle;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Project 5A: The Power of Diffusion Models</h1>
+    <h2>Part 0: Setup</h2>
+    <table>
+      <tr>
+        <td>Using 20 inference steps</td>
+        <td>
+          <img src="./media/oil painting of snowy mountain village 20.png" />
+          <p>"an oil painting of a snowy mountain village"</p>
+        </td>
+        <td>
+          <img src="./media/a man wearing a hat 20.png" />
+          <p>"a man wearing a hat"</p>
+        </td>
+        <td>
+          <img src="./media/a rocket ship 20.png" />
+          <p>"a rocket ship"</p>
+        </td>
+      </tr>
+      <tr>
+        <td>Using 10 inference steps</td>
+        <td>
+          <img src="./media/oil painting of snowy mountain village 10.png" />
+          <p>"an oil painting of a snowy mountain village"</p>
+        </td>
+        <td>
+          <img src="./media/a man wearing a hat 10.png" />
+          <p>"a man wearing a hat"</p>
+        </td>
+        <td>
+          <img src="./media/a rocket ship 10.png" />
+          <p>"a rocket ship"</p>
+        </td>
+      </tr>
+    </table>
+
+    <p>
+      Overall, the DeepFloyd model does a good job of generating images that
+      align with the specified prompt. However, its outputs are quite
+      unrealistic and not too high quality. All the images do look artificial
+      and even for realistic prompts like a man wearing a hat, it still looks
+      like it would be an art piece, not real life. Specifically, we see that
+      with lower inference steps, the quality of our output images goes down. We
+      can see for example, that with the man wearing a hat, detail goes down
+      when we reduce the number of inference steps -- we do not see as
+      noticeable lighting effects in the 10-step man as the 20-step man.
+    </p>
+
+    <p>I am using a seed of 180 for the project.</p>
+    <h2>Part 1: Sampling Loops</h2>
+    <h3>1.1: Implementing the Forward Process</h3>
+    <p>
+      We implement the forward function, which adds a certain amount of noise to
+      an image. The amount of noise added increases depending on the timestep we
+      are on, and this is dictated by the alphas_cumprod associated with the
+      scheduler of the model. The formula used to compute the noisy image is:
+    </p>
+    <img src="./media/forward formula.png" />
+    <p>
+      We show some results for the Campanile noised according to t=250, 500, and
+      750 timesteps.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/campanile.png" width="200px" />
+          <p>Campanile<br />at t=0 (not noisy)</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 250.png" width="200px" />
+          <p>Noisy Campanile<br />at t=250</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 500.png" width="200px" />
+          <p>Noisy Campanile<br />at t=500</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 750.png" width="200px" />
+          <p>Noisy Campanile<br />at t=750</p>
+        </td>
+      </tr>
+    </table>
+    <h3>1.2 Classical Denoising</h3>
+    <p>
+      We attempt to use the classical Gaussian blur method to denoise our
+      images. We use a kernel_size of 5 and a sigma of 2. The intuition behind
+      this is that Gaussian blurring should attenuate the high-frequency noise.
+      However, this does not provide good results.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/noisy campanile 250.png" width="200px" />
+          <p>Noisy Campanile<br />at t=250</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 500.png" width="200px" />
+          <p>Noisy Campanile<br />at t=500</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 750.png" width="200px" />
+          <p>Noisy Campanile<br />at t=750</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/gaussian campanile 250.png" width="200px" />
+          <p>Gaussian Blur Denoising<br />at t=250</p>
+        </td>
+        <td>
+          <img src="./media/gaussian campanile 500.png" width="200px" />
+          <p>Gaussian Blur Denoising<br />at t=500</p>
+        </td>
+        <td>
+          <img src="./media/gaussian campanile 750.png" width="200px" />
+          <p>Gaussian Blur Denoising<br />at t=750</p>
+        </td>
+      </tr>
+    </table>
+    <h3>1.3 One-Step Denoising</h3>
+    <p>
+      We use the pre-trained Stage 1 DeepFloyd model to do one-step denoising.
+      One-step denoising works by estimating the noise in a noisy image and then
+      removing the noise from the image. Removing the noise from the image is
+      done with the help of the following formula, where we have x_t and a
+      prediction for epsilon, and we try to recover x_0.
+    </p>
+    <img src="./media/forward formula.png" />
+
+    <p>
+      We look at the results of one-step denoising for the Campanile noised at
+      different levels (higher t = more noise). One-step denoising does better
+      with lower noise added to the input image, which makes sense because it is
+      easier to extract the signal of the original image if less noise is added.
+    </p>
+    <table>
+      <tr>
+        <td colspan="3">
+          <img src="./media/campanile.png" width="200px" />
+          <p>Original Campanile<br />at t=250</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/noisy campanile 250.png" width="200px" />
+          <p>Noisy Campanile<br />at t=250</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 500.png" width="200px" />
+          <p>Noisy Campanile<br />at t=500</p>
+        </td>
+        <td>
+          <img src="./media/noisy campanile 750.png" width="200px" />
+          <p>Noisy Campanile<br />at t=750</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img
+            src="./media/one step denoised campanile 250.png"
+            width="200px"
+          />
+          <p>One-Step Denoised<br />Campanile at t=250</p>
+        </td>
+        <td>
+          <img
+            src="./media/one step denoised campanile 500.png"
+            width="200px"
+          />
+          <p>One-Step Denoised<br />Campanile at t=500</p>
+        </td>
+        <td>
+          <img
+            src="./media/one step denoised campanile 750.png"
+            width="200px"
+          />
+          <p>One-Step Denoised<br />Campanile at t=750</p>
+        </td>
+      </tr>
+    </table>
+    <h3>1.4 Iterative Denoising</h3>
+    <p>
+      Now, we switch to iterative denoising. We start off with a noisy image and
+      apply our UNet to predict the noise added. We remove only some of this
+      noise to end up with a slightly less noisy image, rather than straight to
+      a prediction for the denoised image. We repeat the process until we end up
+      with a denoised image. The following formula shows how we iteratively
+      denoise the image at each timestep.
+    </p>
+    <img src="./media/iterative denoising formula.png" />
+    <p>
+      In our implementation, we start off with the noisy image at timestep t=990
+      and then denoise for every 30 timesteps, until we reach timestep t=0.
+    </p>
+
+    <p>
+      We run iterative denoising on a noisy version of the Campanile. From right
+      to left, we see that iterative denoising gradually denoises the image.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/denoising campanile 90.png" width="200px" />
+          <p>Noisy Campanile<br />at t=90</p>
+        </td>
+        <td>
+          <img src="./media/denoising campanile 240.png" width="200px" />
+          <p>Noisy Campanile<br />at t=240</p>
+        </td>
+        <td>
+          <img src="./media/denoising campanile 390.png" width="200px" />
+          <p>Noisy Campanile<br />at t=390</p>
+        </td>
+        <td>
+          <img src="./media/denoising campanile 540.png" width="200px" />
+          <p>Noisy Campanile<br />at t=540</p>
+        </td>
+        <td>
+          <img src="./media/denoising campanile 690.png" width="200px" />
+          <p>Noisy Campanile<br />at t=690</p>
+        </td>
+      </tr>
+    </table>
+    <p>
+      We also compare to one-step denoised Campanile and find that iterative
+      denoising recovers more of the details. Iterative denoising does far
+      better than classical Gaussian denoising as well.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/campanile.png" width="200px" />
+          <p>Original<br />Campanile</p>
+        </td>
+        <td>
+          <img
+            src="./media/iteratively denoised campanile 990.png"
+            width="200px"
+          />
+          <p>Iteratively Denoised<br />Campanile</p>
+        </td>
+        <td>
+          <img
+            src="./media/one step denoised campanile 990.png"
+            width="200px"
+          />
+          <p>One-Step Denoised<br />Campanile</p>
+        </td>
+        <td>
+          <img
+            src="./media/gaussian blurred denoised campanile 990.png"
+            width="200px"
+          />
+          <p>Gaussian Blurred<br />Campanile</p>
+        </td>
+      </tr>
+    </table>
+
+    <h3>1.5 Diffusion Model Sampling</h3>
+    <p>
+      We can generate images from scratch by sampling from the diffusion model
+      and starting off with completely random noise (i.e, i_start = 0), which
+      denoises pure noise. Below are results of following that process for the
+      prompt "a high quality photo".
+    </p>
+    <table>
+      <td>
+        <img src="./media/diffusion sampled 0.png" width="200px" />
+        <p>Sample 1</p>
+      </td>
+      <td>
+        <img src="./media/diffusion sampled 1.png" width="200px" />
+        <p>Sample 2</p>
+      </td>
+      <td>
+        <img src="./media/diffusion sampled 2.png" width="200px" />
+        <p>Sample 3</p>
+      </td>
+      <td>
+        <img src="./media/diffusion sampled 3.png" width="200px" />
+        <p>Sample 4</p>
+      </td>
+      <td>
+        <img src="./media/diffusion sampled 4.png" width="200px" />
+        <p>Sample 5</p>
+      </td>
+    </table>
+
+    <h3>1.6 Classifier-Free Guidance</h3>
+    <p>
+      However, we find that the photos in the previous part are not very
+      high-quality at all. Classifier-free guidance (CFG) can help us generate
+      images that align more to the prompt, and in this case, will have higher
+      quality. We compute noise estimates from the UNet using both the
+      conditional prompt ("a high quality photo") and unconditional prompt (""),
+      and then compute the noise estimate to use for denoising with the
+      following formula:
+    </p>
+    <img src="./media/cfg formula.png" />
+
+    <p>In our implementation, we use a CFG scale of gamma = 7.</p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/high quality photo 1.png" width="200px" />
+          <p>Sample 1 with CFG</p>
+        </td>
+        <td>
+          <img src="./media/high quality photo 2.png" width="200px" />
+          <p>Sample 2 with CFG</p>
+        </td>
+        <td>
+          <img src="./media/high quality photo 3.png" width="200px" />
+          <p>Sample 3 with CFG</p>
+        </td>
+        <td>
+          <img src="./media/high quality photo 4.png" width="200px" />
+          <p>Sample 4 with CFG</p>
+        </td>
+        <td>
+          <img src="./media/high quality photo 5.png" width="200px" />
+          <p>Sample 5 with CFG</p>
+        </td>
+      </tr>
+    </table>
+
+    <p>We find that the generated images are of higher quality.</p>
+
+    <h3>1.7 Image-to-image translation</h3>
+
+    <p>
+      Here, we explore the SDEdit algorithm. We take an original image, noise it
+      according to different levels, and then denoise with iterative denoising
+      and CFG with prompt "a high quality photo". We find that the more noise is
+      added to the original image (i.e., for lower values of i_start), the more
+      different the denoised image is from the original image. This makes sense
+      because if not much noise is added to the original image, iterative
+      denoising is more likely to provide a result that lies closer on the image
+      manifold to the original image.
+    </p>
+
+    <p>
+      In the following examples that we ran, we see the images look more and
+      more like the original image as we start with higher values of i_start
+      (i.e., less noisy images).
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/sdedit campanile 1.png" width="200px" />
+          <p>SDEdit with i_start = 1<br />given campanile</p>
+        </td>
+        <td>
+          <img src="./media/sdedit campanile 3.png" width="200px" />
+          <p>SDEdit with i_start = 3<br />given campanile</p>
+        </td>
+        <td>
+          <img src="./media/sdedit campanile 5.png" width="200px" />
+          <p>SDEdit with i_start = 5<br />given campanile</p>
+        </td>
+        <td>
+          <img src="./media/sdedit campanile 7.png" width="200px" />
+          <p>SDEdit with i_start = 7<br />given campanile</p>
+        </td>
+        <td>
+          <img src="./media/sdedit campanile 10.png" width="200px" />
+          <p>SDEdit with i_start = 10<br />given campanile</p>
+        </td>
+        <td>
+          <img src="./media/sdedit campanile 20.png" width="200px" />
+          <p>SDEdit with i_start = 20<br />given campanile</p>
+        </td>
+        <td>
+          <img src="./media/campanile.png" width="200px" />
+          <p>Original<br />Campanile</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/sdedit nuggets 1.png" width="200px" />
+          <p>SDEdit with i_start = 1<br />given nuggets</p>
+        </td>
+        <td>
+          <img src="./media/sdedit nuggets 3.png" width="200px" />
+          <p>SDEdit with i_start = 3<br />given nuggets</p>
+        </td>
+        <td>
+          <img src="./media/sdedit nuggets 5.png" width="200px" />
+          <p>SDEdit with i_start = 5<br />given nuggets</p>
+        </td>
+        <td>
+          <img src="./media/sdedit nuggets 7.png" width="200px" />
+          <p>SDEdit with i_start = 7<br />given nuggets</p>
+        </td>
+        <td>
+          <img src="./media/sdedit nuggets 10.png" width="200px" />
+          <p>SDEdit with i_start = 10<br />given nuggets</p>
+        </td>
+        <td>
+          <img src="./media/sdedit nuggets 20.png" width="200px" />
+          <p>SDEdit with i_start = 20<b r />given nuggets</p>
+        </td>
+        <td>
+          <img src="./media/nuggets.png" width="200px" />
+          <p>Original<br />Nuggets</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/sdedit yosemite 1.png" width="200px" />
+          <p>SDEdit with i_start = 1<br />given Yosemite</p>
+        </td>
+        <td>
+          <img src="./media/sdedit yosemite 3.png" width="200px" />
+          <p>SDEdit with i_start = 3<br />given Yosemite</p>
+        </td>
+        <td>
+          <img src="./media/sdedit yosemite 5.png" width="200px" />
+          <p>SDEdit with i_start = 5<br />given Yosemite</p>
+        </td>
+        <td>
+          <img src="./media/sdedit yosemite 7.png" width="200px" />
+          <p>SDEdit with i_start = 7<br />given Yosemite</p>
+        </td>
+        <td>
+          <img src="./media/sdedit yosemite 10.png" width="200px" />
+          <p>SDEdit with i_start = 10<br />given Yosemite</p>
+        </td>
+        <td>
+          <img src="./media/sdedit yosemite 20.png" width="200px" />
+          <p>SDEdit with i_start = 20<br />given Yosemite</p>
+        </td>
+        <td>
+          <img src="./media/yosemite.png" width="200px" />
+          <p>Original<br />Yosemite</p>
+        </td>
+      </tr>
+    </table>
+
+    <h4>1.7.1 Editing Hand-Drawn and Web Images</h4>
+    <p>
+      We apply the SDEdit algorithm on a web image of Calvin and Hobbes and my
+      handdrawn sketches of a monkey and mountains. We see a similar result of
+      the generated images looking more and more like the original image for
+      higher values of i_start.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/calvin1.png" width="200px" />
+          <p>Calvin and Hobbes<br />at i_start=1</p>
+        </td>
+        <td>
+          <img src="./media/calvin3.png" width="200px" />
+          <p>Calvin and Hobbes<br />at i_start=3</p>
+        </td>
+        <td>
+          <img src="./media/calvin5.png" width="200px" />
+          <p>Calvin and Hobbes<br />at i_start=5</p>
+        </td>
+        <td>
+          <img src="./media/calvin7.png" width="200px" />
+          <p>Calvin and Hobbes<br />at i_start=7</p>
+        </td>
+        <td>
+          <img src="./media/calvin10.png" width="200px" />
+          <p>Calvin and Hobbes<br />at i_start=10</p>
+        </td>
+        <td>
+          <img src="./media/calvin20.png" width="200px" />
+          <p>Calvin and Hobbes<br />at i_start=20</p>
+        </td>
+        <td>
+          <img src="./media/calvin.png" width="200px" />
+          <p>Original<br />Calvin and Hobbes</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/monkey1.png" width="200px" />
+          <p>Monkey<br />at i_start=1</p>
+        </td>
+        <td>
+          <img src="./media/monkey3.png" width="200px" />
+          <p>Monkey<br />at i_start=3</p>
+        </td>
+        <td>
+          <img src="./media/monkey5.png" width="200px" />
+          <p>Monkey<br />at i_start=5</p>
+        </td>
+        <td>
+          <img src="./media/monkey7.png" width="200px" />
+          <p>Monkey<br />at i_start=7</p>
+        </td>
+        <td>
+          <img src="./media/monkey10.png" width="200px" />
+          <p>Monkey<br />at i_start=10</p>
+        </td>
+        <td>
+          <img src="./media/monkey20.png" width="200px" />
+          <p>Monkey<br />at i_start=20</p>
+        </td>
+        <td>
+          <img src="./media/monkey.png" width="200px" />
+          <p>Monkey<br />Sketch</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/mountains1.png" width="200px" />
+          <p>Mountains<br />at i_start=1</p>
+        </td>
+        <td>
+          <img src="./media/mountains3.png" width="200px" />
+          <p>Mountains<br />at i_start=3</p>
+        </td>
+        <td>
+          <img src="./media/mountains5.png" width="200px" />
+          <p>Mountains<br />at i_start=5</p>
+        </td>
+        <td>
+          <img src="./media/mountains7.png" width="200px" />
+          <p>Mountains<br />at i_start=7</p>
+        </td>
+        <td>
+          <img src="./media/mountains10.png" width="200px" />
+          <p>Mountains<br />at i_start=10</p>
+        </td>
+        <td>
+          <img src="./media/mountains20.png" width="200px" />
+          <p>Mountains<br />at i_start=20</p>
+        </td>
+
+        <td>
+          <img src="./media/mountains.png" width="200px" />
+          <p>Mountains<br />Sketch</p>
+        </td>
+      </tr>
+    </table>
+
+    <h4>1.7.2 Inpainting</h4>
+    <p>
+      We explore inpainting, which allows us to just generate one part of the
+      image. At every timestep, we use the following formula to replace
+      everything outside our mask m with the original image, but properly noised
+      for the timestep.
+    </p>
+    <img src="./media/inpainting formula.png" />
+
+    <p>
+      We experiment with inpainting on the Campanile, the Sun, and the Empire
+      State Building.
+    </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/campanile.png" width="200px" />
+          <p>Campanile</p>
+        </td>
+        <td>
+          <img src="./media/campanile mask.png" width="200px" />
+          <p>Mask</p>
+        </td>
+        <td>
+          <img src="./media/campanile masked.png" width="200px" />
+          <p>Hole to Fill</p>
+        </td>
+        <td>
+          <img src="./media/campanile inpainted.png" width="200px" />
+          <p>Campanile Inpainted</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/sun.png" width="200px" />
+          <p>Sun</p>
+        </td>
+        <td>
+          <img src="./media/sun mask.png" width="200px" />
+          <p>Mask</p>
+        </td>
+        <td>
+          <img src="./media/sun masked.png" width="200px" />
+          <p>Hole to Fill</p>
+        </td>
+        <td>
+          <img src="./media/sun inpainted.png" width="200px" />
+          <p>Sun Inpainted</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/empire.png" width="200px" />
+          <p>Empire State</p>
+        </td>
+        <td>
+          <img src="./media/empire mask.png" width="200px" />
+          <p>Mask</p>
+        </td>
+        <td>
+          <img src="./media/empire masked.png" width="200px" />
+          <p>Hole to Fill</p>
+        </td>
+        <td>
+          <img src="./media/empire inpainted.png" width="200px" />
+          <p>Empire State Inpainted</p>
+        </td>
+      </tr>
+    </table>
+
+    <h4>1.7.3 Text-Conditional Image-to-image Translation</h4>
+
+    <p>
+      Now, we follow the SDEdit algorithm but with a text prompt. We noise
+      original images as in SDEdit. The noisier the noisy image (i.e., lower
+      values of i_start), the more the image will look like the text prompt over
+      the original image, since CFG will be able to guide it over more
+      timesteps.
+    </p>
+
+    <p>We experiment with this technique on</p>
+    <ul>
+      <li>text prompt = "a rocket ship" and original image = campanile</li>
+      <li>text prompt = "a photo of a dog" and original image = sun</li>
+      <li>text prompt = "a lithograph of waterfalls" and original image = yosemite</li>
+
+    </ul>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/campanile rocket 1.png" width="200px" />
+          <p>Rocket Ship<br />at noise level 1</p>
+        </td>
+        <td>
+          <img src="./media/campanile rocket 3.png" width="200px" />
+          <p>Rocket Ship<br />at noise level 3</p>
+        </td>
+        <td>
+          <img src="./media/campanile rocket 5.png" width="200px" />
+          <p>Rocket Ship<br />at noise level 5</p>
+        </td>
+        <td>
+          <img src="./media/campanile rocket 7.png" width="200px" />
+          <p>Rocket Ship<br />at noise level 7</p>
+        </td>
+        <td>
+          <img src="./media/campanile rocket 10.png" width="200px" />
+          <p>Rocket Ship<br />at noise level 10</p>
+        </td>
+        <td>
+          <img src="./media/campanile rocket 20.png" width="200px" />
+          <p>Rocket Ship<br />at noise level 20</p>
+        </td>
+        <td>
+          <img src="./media/campanile.png" width="200px" />
+          <p>Original<br />Campanile</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/sun dog 1.png" width="200px" />
+          <p>Dog<br />at noise level 1</p>
+        </td>
+        <td>
+          <img src="./media/sun dog 3.png" width="200px" />
+          <p>Dog<br />at noise level 3</p>
+        </td>
+        <td>
+          <img src="./media/sun dog 5.png" width="200px" />
+          <p>Dog<br />at noise level 5</p>
+        </td>
+        <td>
+          <img src="./media/sun dog 7.png" width="200px" />
+          <p>Dog<br />at noise level 7</p>
+        </td>
+        <td>
+          <img src="./media/sun dog 10.png" width="200px" />
+          <p>Dog<br />at noise level 10</p>
+        </td>
+        <td>
+          <img src="./media/sun dog 20.png" width="200px" />
+          <p>Dog<br />at noise level 20</p>
+        </td>
+        <td>
+          <img src="./media/sun.png" width="200px" />
+          <p>Original<br />Sun</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/yosemite waterfalls 1.png" width="200px" />
+          <p>Waterfalls<br />at noise level 1</p>
+        </td>
+        <td>
+          <img src="./media/yosemite waterfalls 3.png" width="200px" />
+          <p>Waterfalls<br />at noise level 3</p>
+        </td>
+        <td>
+          <img src="./media/yosemite waterfalls 5.png" width="200px" />
+          <p>Waterfalls<br />at noise level 5</p>
+        </td>
+        <td>
+          <img src="./media/yosemite waterfalls 7.png" width="200px" />
+          <p>Waterfalls<br />at noise level 7</p>
+        </td>
+        <td>
+          <img src="./media/yosemite waterfalls 10.png" width="200px" />
+          <p>Waterfalls<br />at noise level 10</p>
+        </td>
+        <td>
+          <img src="./media/yosemite waterfalls 20.png" width="200px" />
+          <p>Waterfalls<br />at noise level 20</p>
+        </td>
+        <td>
+          <img src="./media/yosemite.png" width="200px" />
+          <p>Original<br />Yosemite</p>
+        </td>
+      </tr>
+    </table>
+    <h3>1.8 Visual Anagrams</h3>
+
+    <p>Now, we try to create visual anagrams that look like two different images depending on if it is viewed from the top or bottom. This is done by computing a regular CFG noise estimate with one prompt but then also computing the CFG noise estimate with the other prompt of the flipped image and then flipping that noise estimate. We average the two noise estimates together to get the noise estimate used for iterative denoising. In formulas: </p>
+    <img src="./media/anagrams formula.png"/>
+    
+    <p>Here are some results along with the two prompts used. </p>
+    <table>
+      <tr>
+        <td>
+          <p>Old Man & Campfire</p>
+        </td>
+        <td>
+          <img src="./media/old-campfire.png" width="200px" />
+          <p>"an oil painting<br />of an old man"</p>
+        </td>
+        <td>
+          <img src="./media/campfire-old.png" width="200px" />
+          <p>
+            "an oil painting of people<br />
+            around a campfire"
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Dog & Hipster Barista</p>
+        </td>
+        <td>
+          <img src="./media/dog-barista.png" width="200px" />
+          <p>"a photo of a dog"</p>
+        </td>
+        <td>
+          <img src="./media/barista-dog.png" width="200px" />
+          <p>"a photo of a hipster barista"</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Village & Campfire</p>
+        </td>
+        <td>
+          <img src="./media/village-campfire.png" width="200px" />
+          <p>
+            "an oil painting of a snowy <br />
+            mountain village"
+          </p>
+        </td>
+        <td>
+          <img src="./media/campfire-village.png" width="200px" />
+          <p>
+            "an oil painting of people<br />
+            around a campfire"
+          </p>
+        </td>
+      </tr>
+    </table>
+    <h3>1.9 Hybrid Images</h3>
+
+    <p>We can also create hybrid images using a similar technique as visual anagrams. Here, instead of flipping the noise estimates, we can apply lowpass and highpass filters to the noise estimates. We get the two CFG noise estimates for each of the prompts. For one prompt, we apply a lowpass filter, and for the other, we apply a highpass filter to the noise estimates. We then add together the noise estimates to obtain a noise estimate used for iterative denoising. In formulas:</p>
+
+    <img src="./media/hybrid formulas.png"/>
+    <p>In our implementation, we use a Gaussian filter of kernel_size=33 and sigma=2 for computing the lowpass and highpass results.</p>
+    
+    <p>Here are some results. </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/skull waterfall.png" width="200px" />
+          <p>Hybrid image of a<br />skull and a waterfall</p>
+        </td>
+        <td>
+          <img src="./media/man dog.png" width="200px" />
+          <p>Hybrid image of a<br />dog and an old man</p>
+        </td>
+        <td>
+          <img src="./media/man waterfall.png" width="200px" />
+          <p>Hybrid image of<br />waterfalls and an old man</p>
+        </td>
+      </tr>
+    </table>
+
+    <h1>Project 5B: Diffusion Models from Scratch!</h1>
+    <h2>Part 1: Training a Single-Step Denoising UNet</h2>
+    <h3>1.1 Implementing the UNet</h3>
+    <p>We implement the UNet using simple operations like Conv, DownConv, UpConv, Flatten, Unflatten, and Concat and composed operations like ConvBlock, DownBlock, and UpBlock. Here is the architecture we use: </p>
+    <img src="./media/unconditional_arch.png" width="600px"/>
+    <h3>1.2 Using the UNet to Train a Denoiser</h3>
+    <p>We can train a denoiser that can predict the clean image from a noisy image. To get data to train this denoiser, we take the MNIST digit dataset, and for each image in the dataset, we add noise to it. We can add varying levels of noise, dictated by the sigma parameter, as shown below. </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/unconditional data.png" />
+          <p>Varying levels of noise on MNIST digits</p>
+        </td>
+      </tr>
+    </table>
+
+    <p>We eventually train just for sigma = 0.5.</p>
+    <h4>1.2.1 Training</h4>
+
+    <p>We train the UNet on the MNIST training dataset, generating noisy images using sigma=0.5. We use a hidden dimension in our architecture of 128. We use the Adam optimizer with learning rate=1e-4. We use a batch_size of 256 and train for 5 epochs. Here are our training losses over 5 epochs: </p>
+
+    <table>
+      <tr>
+        <td>
+          <img src="./media/unconditional training losses.png" />
+          <p>
+            Training loss curve for single-step denoising unconditional UNet
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <p>Then, we tested our model on digits from the test set, and we qualitatively looked at how well our model could recover the images noised with sigma=0.5. It seems to do reasonably well. We test using both the model after 1 epoch of training and after all 5 epochs of training -- the model after all 5 epochs seems to do a little better. </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/unconditional 1.png" />
+          <p>Results on digits from the test set after 1 epoch of training</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/unconditional 5.png" />
+          <p>Results on digits from the test set after 5 epoch of training</p>
+        </td>
+      </tr>
+    </table>
+    <h4>1.2.2 Out-of-Distribution Testing</h4>
+
+    <p>We also look at how well our denoising model does for other values of sigma that it was not trained for. From the below results, it appears that the denoising model does decently for other values of sigma, except for sigma=1.0. </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/unconditional ood.png" />
+          <p>Results on digits from the test set with varying noise levels</p>
+        </td>
+      </tr>
+    </table>
+
+    <h2>Part 2: Training a Diffusion Model</h2>
+    <h3>2.1 Adding Time Conditioning to UNet</h3>
+    <p>Now, we look at implementing DDPM. To do so, we first must inject the timestep t into our architecture. We use linear layers composed in an FCBlock to do so, and add these FCBlocks into our architecture as follows: </p>
+    <img src="./media/conditional_arch.png"  width="600px"/>
+    <h3>2.2 Training the UNet</h3>
+    <p>We train the time-conditioned UNet with the help of the following algorithm: Now, instead of predicting the clean image from a noisy image, we aim to predict how much noise was added to the image from a noisy image. In our algorithm, we take clean images, noise it, predict the noise added, and then compute the loss with the actual noise added. </p>
+
+    <img src="./media/algo1_t_only.png"width="600px"/>
+
+    <p>We train with hidden dimension=64, batch_size=128, and over 20 epochs. We also use an Adam optimizer with initial learning rate=1e-3 and use an exponential learning rate decay scheduler that we step every epoch. </p>
+    <p>Here are our training losses. </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/time training losses.png" />
+          <p>Training loss curve for time-conditioned UNet</p>
+        </td>
+      </tr>
+    </table>
+
+    <h3>2.3 Sampling from the UNet</h3>
+    <p>Once we train our time-conditioned UNet, we can sample from it. We use the following algorithm to accomplish iterative denoising. </p>
+    <img src="./media/algo2_t_only.png" width="600px"/>
+
+    <p>We sample results from our model after training for 5 epochs and training for 20 epochs. We see that after training for 20 epochs, our model produces more coherent images of digits.</p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/time 5.png" />
+          <p>Sampling results from the 5th epoch for time-conditioned UNet</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/time 20.png" />
+          <p>Sampling results from the 20th epoch for time-conditioned UNet</p>
+        </td>
+      </tr>
+    </table>
+
+    <h3>2.4 Adding Class-Conditioning to UNet</h3>
+
+    <p>Now, we work to add class-conditioning to our time-conditioned UNet so that we can generate an image of a specific digit. To do so, we inject the class into the architecture at similar places as where we injected the timestep. We fetch classes as well from the MNIST dataset, and then pass in a one-hot vector representing the class into our network. With probability p_uncond = 0.1, we zero out this class conditioning vector so that our UNet will work without being conditioned on the class. Here is the algorithm: </p>
+    <img src="./media/algo3_c.png" width="600px"/>
+
+    <p>We train with the same hyperparameters as before. Here is the training loss curve: </p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/class training losses.png" />
+          <p>Training loss curve for time-conditioned UNet</p>
+        </td>
+      </tr>
+    </table>
+
+    <h3>2.5 Sampling from the Class-Conditioned UNet</h3>
+    <p>Once we train our class-conditioned UNet, we can sample from it. We use CFG so that our outputs will look more like the desired class. The unconditional is a zeroed-out class vector, while the conditional is the one-hot class vector of the desired class. Here is the algorithm we follow: </p>
+
+    <img src="./media/algo4_c.png" width="600px"/>
+
+    <p>We use a guidance scale of gamma = 5</p>
+    <table>
+      <tr>
+        <td>
+          <img src="./media/class 5.png" />
+          <p>Sampling results from the 5th epoch for class-conditioned UNet</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="./media/class 20.png" />
+          <p>Sampling results from the 20th epoch for class-conditioned UNet</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
