@@ -1,0 +1,63 @@
+title: "Kanav Mittal"
+# subtitle: "Research, teaching, travel, and projects"
+name: "Kanav Mittal"
+description: "Kanav's personal website"
+url: "https://kanavmittal314.github.io"
+baseurl: ""
+repository: "kanavmittal314/kanavmittal314.github.io"
+
+remote_theme: "mmistakes/minimal-mistakes@4.28.0"
+minimal_mistakes_skin: "air"
+locale: "en-US"
+search: true
+
+plugins:
+  - jekyll-remote-theme
+  - jekyll-include-cache
+
+author:
+  name: "Kanav Mittal"
+  avatar: "headshot.jpg"
+  bio: "EECS at Berkeley (B.S. '25, M.S. '26)\nIncoming Software Engineer at NVIDIA"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/kanavmittal314"
+
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/kanavmittal314"
+
+include:
+  - _pages
+
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: single
+      author_profile: true
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: false
+      share: true
+      related: true
+
+markdown: kramdown
+permalink: /:categories/:title/
+timezone: America/Los_Angeles
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
