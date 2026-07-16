@@ -1,4 +1,6 @@
 main:
+  - title: "About"
+    url: /
   - title: "Research"
     url: /research/
   - title: "Teaching"
@@ -9,5 +11,3 @@ main:
     url: /cs180/
   - title: "Blog"
     url: /blog/
-  - title: "About"
-    url: /
