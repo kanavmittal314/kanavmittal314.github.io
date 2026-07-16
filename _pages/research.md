@@ -20,7 +20,7 @@ Kanav Mittal, Ruchir Rastogi, and Nilah Ioannidis.<br>
 ## Theses
 
 **Alignment Challenges in Educational AI**<br>
-Kanav Mittal (advisor: Gireeja Ranade). Master's thesis, EECS Department, University of California, Berkeley, 2026. [[technical report]](http://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-199.html)
+Kanav Mittal (advisor: Gireeja Ranade). Master's thesis, EECS Department, University of California, Berkeley, 2026. [[thesis]](http://www2.eecs.berkeley.edu/Pubs/TechRpts/2026/EECS-2026-199.html)
 
 **Methods to Improve Prediction of Gene Expression from Noncoding Regulatory DNA Sequence**<br>
 Kanav Mittal. Senior honors thesis (advisor: Nilah Ioannidis), EECS Department, University of California, Berkeley, 2025. [[thesis]]({{ '/assets/Kanav%20Mittal%20-%20Senior%20Thesis.pdf' | relative_url }})
