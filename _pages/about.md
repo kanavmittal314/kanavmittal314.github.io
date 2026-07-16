@@ -14,11 +14,3 @@ Before that, I graduated with my B.S. in EECS from UC Berkeley as well (go bears
 Throughout my time at Berkeley, I was lucky to serve as a TA for EECS 16A (Designing Information Devices and Systems), CS 61B (Data Structures), and CS 188 (Artificial Intelligence). I am also thankful to Professors Narges Norouzi and Serina Chang for their mentorship on other research projects, and to Professors Gasper Begus and Antje Postema for a wonderful time living at Bowles Hall Residential College.
 
 In my free time, I enjoy hiking or running the beautiful Bay Area trails, cheering on the Warriors, and cooking up new fusion recipes. 
-
-Check out the following sections of my websites:
-
-- [Research](/research/) for a list of publications, posters, and other projects.
-- [Teaching](/teaching/) for past teaching experiences and relevant resources.
-- [Travel](/travel/) for itineraries on trips I've been on if you want any recommendations!
-- [Blog](/blog/) for random thoughts.
-- [CS180 Portfolio](/cs180/) for some fun computer vision and computational photography projects :)
