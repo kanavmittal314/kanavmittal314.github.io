@@ -3,8 +3,6 @@ title: "Research"
 permalink: /research/
 ---
 
-My research focuses on educational AI and intelligent tutoring systems.
-
 ## Publications & Posters
 
 **Modeling Student Knowledge Progression Across Concepts in Intelligent Tutoring Interactions**<br>
