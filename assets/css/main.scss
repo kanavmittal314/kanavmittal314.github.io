@@ -8,8 +8,12 @@
 @import "minimal-mistakes";
 
 /* A compact, editorial type scale for the personal site. */
+html {
+  font-size: 14px;
+}
+
 .page__title {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
 }
 
 .page__content,
